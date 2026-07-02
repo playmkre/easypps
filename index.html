@@ -131,6 +131,24 @@
 
   <!-- 단계 1: 업로드 -->
   <div class="step-body" id="step1">
+    <div class="card" id="prefCard" style="margin-bottom:14px">
+      <div class="card-title">기본 정보</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:560px">
+        <div>
+          <label for="companySelect" style="display:block;font-size:13px;margin-bottom:6px;font-weight:600">회사명</label>
+          <select id="companySelect" style="width:100%;padding:8px 10px;border:1px solid var(--c-border,#d0d5dd);border-radius:8px;background:var(--c-card,#fff);color:inherit;font-size:14px">
+            <option value="" disabled selected>회사 선택</option>
+            <option value="A">A 회사</option>
+            <option value="B">B 회사</option>
+          </select>
+        </div>
+        <div>
+          <label for="inspectCount" style="display:block;font-size:13px;margin-bottom:6px;font-weight:600">검사 횟수 (1~10)</label>
+          <input type="number" id="inspectCount" min="1" max="10" step="1" value="1" style="width:100%;padding:8px 10px;border:1px solid var(--c-border,#d0d5dd);border-radius:8px;background:var(--c-card,#fff);color:inherit;font-size:14px">
+        </div>
+      </div>
+      <div style="font-size:12px;color:#888;margin-top:8px">* 검사 횟수는 성적서의 측정 결과 열 수와 연동됩니다(추후 적용).</div>
+    </div>
     <div class="card">
       <div class="card-title">파일 업로드</div>
       <div class="upload-grid">
@@ -529,6 +547,11 @@
 <script src="./js/85_numbering_workspace_helper.js"></script>
 <script src="./js/91_reference_position_map_80871631.js"></script>
 <script src="./js/99_auth_logs.js"></script>
+<script>
+/* v0.7.2: company / inspection-count accessors */
+window.getSelectedCompany=function(){var e=document.getElementById('companySelect');return e?e.value:'';};
+window.getInspectCount=function(){var e=document.getElementById('inspectCount');var n=e?parseInt(e.value,10):1;if(isNaN(n)||n<1)n=1;if(n>10)n=10;return n;};
+</script>
 </body>
 </html>
 
