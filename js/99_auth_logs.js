@@ -128,6 +128,8 @@
     rows.unshift(row);
     rows.sort((a,b)=>logMs(b)-logMs(a));
     setLogs(type, rows);
+    /* v0.7.2: 로컬 로그서버(:9200)로 미러링 - 서버 켜져 있으면 항상 기록, 꺼져 있으면 조용히 무시 */
+    try{ fetch('http://127.0.0.1:9200/api/log',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({__type:type},row))}).catch(function(){}); }catch(e){}
   }
   function deny(msg){ if(typeof showAlert==='function') showAlert('권한 없음', msg || '현재 계정에는 이 기능을 사용할 권한이 없습니다.'); else alert(msg || '권한 없음'); }
   function requireCan(key){ if(!current()){ $('v060LoginOverlay')?.classList.remove('v060-hidden'); return false; } if(!can(key)){ deny(); return false; } return true; }
