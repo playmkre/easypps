@@ -1,2843 +1,833 @@
-<!DOCTYPE html>
-<!-- QR_COUPON_GOOGLE_SHEET_LEDGER_WEBAPP v0.1 · Index.html (HTMLService) -->
-<!-- 매장: 이태리식당 꽃반지 · 메인 DB = Google Sheet · 서버 = Apps Script -->
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
-<base target="_top">
-<meta charset="utf-8">
-<style>
-:root{--bg:#f4f2ee;--surface:#fff;--surface-2:#faf8f4;--ink:#1c1f26;--ink-soft:#565b66;--muted:#8b919d;
---line:#e7e3dc;--line-2:#efece6;--brand:#d8492b;--brand-ink:#b63a20;--brand-soft:#fbe9e3;
---ok:#1a9d5a;--ok-soft:#e3f5ea;--warn:#c8810a;--warn-soft:#fbf0d8;--danger:#cf3b2c;--danger-soft:#fbe4e0;
---info:#2563c9;--info-soft:#e6effc;--void:#5b616b;--void-soft:#eceef1;--done:#6b7280;--done-soft:#eef0f2;
---mono:'SF Mono',ui-monospace,Menlo,monospace;--shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.06)}
-body[data-theme=dark]{--bg:#15171c;--surface:#1e2128;--surface-2:#262a32;--ink:#e9ebee;--ink-soft:#b6bcc6;--muted:#838b97;
---line:#333845;--line-2:#2b303a;--brand-soft:#3a2017;--brand-ink:#f0a48f;--ok-soft:#16331f;--warn-soft:#3a2c12;
---danger-soft:#3a1d18;--info-soft:#162641;--void-soft:#2b2f38;--done-soft:#2a2e36;--shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.35)}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
-.app{display:flex;min-height:100vh}
-.sidebar{width:236px;background:var(--surface);border-right:1px solid var(--line);position:fixed;top:0;bottom:0;left:0;padding:18px 14px;overflow-y:auto;z-index:30}
-.brand{display:flex;align-items:center;gap:10px;padding:4px 6px 16px}
-.brand .logo{width:36px;height:36px;border-radius:10px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:800;font-size:16px}
-.brand .b-name{font-weight:800;font-size:15px} .brand .b-sub{font-size:11px;color:var(--muted)}
-.nav-label{font-size:10.5px;font-weight:800;color:var(--muted);letter-spacing:.5px;padding:14px 8px 6px}
-.nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:9px;font-size:13.5px;font-weight:600;color:var(--ink-soft);transition:.12s;cursor:pointer;border:none;background:none;text-align:left}
-.nav-item:hover{background:var(--surface-2)} .nav-item.on{background:var(--brand-soft);color:var(--brand-ink);font-weight:800}
-.nav-item .ic{width:18px;text-align:center}
-.main{flex:1;margin-left:236px;min-width:0}
-.topbar{height:58px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:0 18px;position:sticky;top:0;z-index:20}
-.topbar .store{display:flex;align-items:center;gap:7px;font-weight:700;font-size:13px} .topbar .dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
-.spacer{flex:1}
-.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:15px;cursor:pointer;color:var(--ink)}
-.menu-btn{display:none}
-.wrap{padding:22px;max-width:1180px}
-.page-head h1{font-size:21px;font-weight:800} .page-head p{color:var(--muted);font-size:13px;margin-top:3px}
-.section-title{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;color:var(--muted);margin:20px 0 12px} .section-title .ln{flex:1;height:1px;background:var(--line)}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
-.stat{padding:15px}.stat .k{font-size:12px;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:6px}.stat .v{font-size:24px;font-weight:800;margin-top:6px}.stat .v small{font-size:13px;font-weight:600;color:var(--muted)}.stat .sub{font-size:11px;color:var(--muted);margin-top:2px}
-.stat.accent{border-color:#bfe6cd}.stat.warn{border-color:#f3d9ad}.stat.danger{border-color:#f0b3a5}.stat.info{border-color:#c5d8fb}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 15px;border-radius:11px;font-weight:700;font-size:14px;cursor:pointer;border:1px solid transparent;transition:.12s}
-.btn-primary{background:var(--brand);color:#fff}.btn-primary:hover{background:var(--brand-ink)}
-.btn-ghost{background:var(--surface);border-color:var(--line);color:var(--ink)}.btn-ghost:hover{background:var(--surface-2)}
-.btn-danger{background:var(--void);color:#fff}.btn-sm{padding:8px 12px;font-size:12.5px;border-radius:9px}.btn-block{width:100%}.btn:disabled{opacity:.45;cursor:not-allowed}
-.field{margin-bottom:14px}.field label{display:block;font-size:12.5px;font-weight:700;color:var(--ink-soft);margin-bottom:6px}
-.inp,select.inp,textarea.inp{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font-size:14px}
-.inp:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
-body[data-theme=dark] .inp{background:var(--surface-2)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.note{border:1px solid var(--line);border-radius:12px;padding:13px 15px;background:var(--surface);font-size:13px}
-.note.info{background:var(--info-soft);border-color:#c5d8fb;color:#1b3a78}.note.warn{background:var(--warn-soft);border-color:#f3d9ad;color:#7a4e10}.note.ok{background:var(--ok-soft);border-color:#bfe6cd;color:#155f37}.note.brand{background:var(--brand-soft);border-color:#f3c9bd;color:var(--brand-ink)}
-body[data-theme=dark] .note.info{color:#a9c6ff;border-color:#2a3f63}body[data-theme=dark] .note.warn{color:#f1cd92;border-color:#5c4a24}body[data-theme=dark] .note.ok{color:#8edaa6;border-color:#27502f}body[data-theme=dark] .note.brand{color:#f0a48f}
-.note .em{font-weight:800}
-.badge-st{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:20px}
-.b-unused{color:var(--ok);background:var(--ok-soft)}.b-used{color:var(--done);background:var(--done-soft)}.b-expired{color:var(--warn);background:var(--warn-soft)}.b-void{color:var(--void);background:var(--void-soft)}.b-cancelled{color:var(--danger);background:var(--danger-soft)}.b-valid{color:var(--ok);background:var(--ok-soft)}
-body[data-theme=dark] .b-unused,body[data-theme=dark] .b-valid{color:#5fd089}body[data-theme=dark] .b-used,body[data-theme=dark] .b-void{color:#aeb6c2}body[data-theme=dark] .b-expired{color:#f1cd92}body[data-theme=dark] .b-cancelled{color:#ff9b87}
-table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line-2)}th{font-size:11.5px;color:var(--muted);font-weight:700}
-.tbl-wrap{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:auto;box-shadow:var(--shadow)}
-.mono{font-family:var(--mono);font-size:12px}.amt{font-weight:700;text-align:right}
-.empty{text-align:center;color:var(--ink-soft);padding:40px 20px;font-weight:700}.empty small{display:block;font-weight:500;color:var(--muted);margin-top:5px}
-.subtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;border-bottom:1px solid var(--line)}
-.subtab{padding:10px 14px;font-size:13px;font-weight:700;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none}
-.subtab.on{color:var(--brand);border-bottom-color:var(--brand)}
-.page{display:none}.page.on{display:block}
-/* 쿠폰 카드 미리보기 (인쇄물 기준 라이트 고정) */
-.coupon-img{width:300px;max-width:100%;background:#fff;border:1px solid #e7e3dc;border-radius:18px;padding:20px;color:#1c1f26;margin:0 auto}
-.coupon-img .ch{display:flex;justify-content:space-between;align-items:center}.coupon-img .store-nm{font-weight:800;font-size:15px}.coupon-img .ctype{font-size:10.5px;font-weight:700;color:#d8492b}
-.coupon-img .cname{text-align:center;font-size:13px;color:#565b66;font-weight:600;margin-top:14px}
-.coupon-img .cvalue{text-align:center;font-size:34px;font-weight:900;color:#d8492b}.coupon-img .cvalue small{font-size:15px}
-.coupon-img .qrbox{width:140px;height:140px;margin:6px auto;background:#fff;border:1px solid #eee;border-radius:8px;padding:6px}.coupon-img .qrbox svg{width:100%;height:100%;display:block}
-.coupon-img .cno2{text-align:center;font-size:12px;font-weight:700;color:#565b66;margin-top:4px}.coupon-img .cdate{text-align:center;font-size:11px;color:#8b919d}
-.coupon-img .cfoot{border-top:1px dashed #e7e3dc;margin-top:12px;padding-top:10px;text-align:center;font-size:9.5px;color:#8b919d;line-height:1.6}
-.tpl-pick{display:flex;gap:8px;margin-top:14px}.tp{flex:1;padding:9px;border:1px solid var(--line);border-radius:9px;font-size:11.5px;font-weight:700;color:var(--ink-soft);background:var(--surface);cursor:pointer}.tp.on{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-ink)}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;padding:18px;z-index:100}.modal-bg.on{display:flex}
-.modal{background:var(--surface);border-radius:18px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-.modal-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modal-head h3{font-size:16px}
-.modal-body{padding:18px 20px}.modal-foot{padding:14px 20px 18px;display:flex;gap:10px;flex-wrap:wrap}
-.kv{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line-2);font-size:13px}.kv:last-child{border-bottom:none}.kv .k{color:var(--muted);font-weight:600}.kv .v{font-weight:700;text-align:right}.kv .v.big{font-size:16px;color:var(--brand-ink)}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:30px;font-size:13px;font-weight:700;opacity:0;transition:.3s;z-index:200}.toast.on{transform:translateX(-50%) translateY(0);opacity:1}
-.seg{display:flex;gap:8px}.seg .opt{flex:1;padding:10px;border:1px solid var(--line);border-radius:10px;font-weight:700;font-size:13px;color:var(--ink-soft);background:var(--surface);cursor:pointer;text-align:center}.seg .opt.on{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-ink)}
-body[data-theme=dark] .seg .opt{background:var(--surface-2)}
-.mtab{display:none}
-.inspect-bar{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.insp-btn{padding:9px 13px;border:1px solid var(--line);border-radius:9px;font-size:12.5px;font-weight:700;color:var(--ink-soft);background:var(--surface);cursor:pointer}.insp-btn.on{background:var(--ink);color:#fff}
-body.inspect .main{margin:0 auto;border:2px dashed var(--brand)}
-body.inspect.vp-360 .main{max-width:360px}body.inspect.vp-412 .main{max-width:412px}body.inspect.vp-768 .main{max-width:768px}body.inspect.vp-1024 .main{max-width:1024px}body.inspect.vp-1280 .main{max-width:1280px}
-body.inspect.vp-360 .sidebar,body.inspect.vp-412 .sidebar,body.inspect.vp-768 .sidebar{display:none}
-body.inspect.vp-360 .main,body.inspect.vp-412 .main,body.inspect.vp-768 .main{margin-left:auto}
-body.inspect.vp-360 .menu-btn,body.inspect.vp-412 .menu-btn,body.inspect.vp-768 .menu-btn{display:grid}
-body.inspect.vp-360 .stats,body.inspect.vp-412 .stats{grid-template-columns:1fr 1fr}
-/* redeem 화면 */
-.redeem-wrap{max-width:440px;margin:0 auto;padding:24px 18px}
-.redeem-head{text-align:center;margin-bottom:20px}.redeem-head .logo{width:52px;height:52px;border-radius:14px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:800;font-size:22px;margin:0 auto 10px}
-.rstate{padding:20px;border-radius:16px;text-align:center;margin-bottom:18px}
-.rstate.valid{background:var(--ok-soft);border:1px solid #bfe6cd}.rstate.block{background:var(--danger-soft);border:1px solid #f0b3a5}
-.rstate .ic{font-size:34px}.rstate .t{font-size:18px;font-weight:800;margin-top:6px}.rstate .s{font-size:13px;color:var(--ink-soft);margin-top:4px}
-@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:760px){.sidebar{display:none}.main{margin-left:0}.menu-btn{display:grid}.mtab{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--line);z-index:40}.mtab button{flex:1;padding:9px 0;font-size:10.5px;font-weight:700;color:var(--muted);background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}.mtab button.on{color:var(--brand)}.mtab .mi{font-size:17px}.wrap{padding-bottom:80px}.grid2{grid-template-columns:1fr}}
-</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>검사성적서 자동 생성 v0.7.0A NUMBERING_WORKSPACE_SPLIT_REVIEWED_FIXED</title>
+
+
+
+
+<link rel="stylesheet" href="./css/app.css">
 </head>
-<body data-theme="light">
-
-<!-- ============ QR 인코더 (kazuhikoarase qrcode-generator, MIT) — 실제 스캔 가능 ============ -->
-<script>//---------------------------------------------------------------------
-//
-// QR Code Generator for JavaScript
-//
-// Copyright (c) 2009 Kazuhiko Arase
-//
-// URL: http://www.d-project.com/
-//
-// Licensed under the MIT license:
-//  http://www.opensource.org/licenses/mit-license.php
-//
-// The word 'QR Code' is registered trademark of
-// DENSO WAVE INCORPORATED
-//  http://www.denso-wave.com/qrcode/faqpatent-e.html
-//
-//---------------------------------------------------------------------
-
-var qrcode = function() {
-
-  //---------------------------------------------------------------------
-  // qrcode
-  //---------------------------------------------------------------------
-
-  /**
-   * qrcode
-   * @param typeNumber 1 to 40
-   * @param errorCorrectionLevel 'L','M','Q','H'
-   */
-  var qrcode = function(typeNumber, errorCorrectionLevel) {
-
-    var PAD0 = 0xEC;
-    var PAD1 = 0x11;
-
-    var _typeNumber = typeNumber;
-    var _errorCorrectionLevel = QRErrorCorrectionLevel[errorCorrectionLevel];
-    var _modules = null;
-    var _moduleCount = 0;
-    var _dataCache = null;
-    var _dataList = [];
-
-    var _this = {};
-
-    var makeImpl = function(test, maskPattern) {
-
-      _moduleCount = _typeNumber * 4 + 17;
-      _modules = function(moduleCount) {
-        var modules = new Array(moduleCount);
-        for (var row = 0; row < moduleCount; row += 1) {
-          modules[row] = new Array(moduleCount);
-          for (var col = 0; col < moduleCount; col += 1) {
-            modules[row][col] = null;
-          }
-        }
-        return modules;
-      }(_moduleCount);
-
-      setupPositionProbePattern(0, 0);
-      setupPositionProbePattern(_moduleCount - 7, 0);
-      setupPositionProbePattern(0, _moduleCount - 7);
-      setupPositionAdjustPattern();
-      setupTimingPattern();
-      setupTypeInfo(test, maskPattern);
-
-      if (_typeNumber >= 7) {
-        setupTypeNumber(test);
-      }
-
-      if (_dataCache == null) {
-        _dataCache = createData(_typeNumber, _errorCorrectionLevel, _dataList);
-      }
-
-      mapData(_dataCache, maskPattern);
-    };
-
-    var setupPositionProbePattern = function(row, col) {
-
-      for (var r = -1; r <= 7; r += 1) {
-
-        if (row + r <= -1 || _moduleCount <= row + r) continue;
-
-        for (var c = -1; c <= 7; c += 1) {
-
-          if (col + c <= -1 || _moduleCount <= col + c) continue;
-
-          if ( (0 <= r && r <= 6 && (c == 0 || c == 6) )
-              || (0 <= c && c <= 6 && (r == 0 || r == 6) )
-              || (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
-            _modules[row + r][col + c] = true;
-          } else {
-            _modules[row + r][col + c] = false;
-          }
-        }
-      }
-    };
-
-    var getBestMaskPattern = function() {
-
-      var minLostPoint = 0;
-      var pattern = 0;
-
-      for (var i = 0; i < 8; i += 1) {
-
-        makeImpl(true, i);
-
-        var lostPoint = QRUtil.getLostPoint(_this);
-
-        if (i == 0 || minLostPoint > lostPoint) {
-          minLostPoint = lostPoint;
-          pattern = i;
-        }
-      }
-
-      return pattern;
-    };
-
-    var setupTimingPattern = function() {
-
-      for (var r = 8; r < _moduleCount - 8; r += 1) {
-        if (_modules[r][6] != null) {
-          continue;
-        }
-        _modules[r][6] = (r % 2 == 0);
-      }
-
-      for (var c = 8; c < _moduleCount - 8; c += 1) {
-        if (_modules[6][c] != null) {
-          continue;
-        }
-        _modules[6][c] = (c % 2 == 0);
-      }
-    };
-
-    var setupPositionAdjustPattern = function() {
-
-      var pos = QRUtil.getPatternPosition(_typeNumber);
-
-      for (var i = 0; i < pos.length; i += 1) {
-
-        for (var j = 0; j < pos.length; j += 1) {
-
-          var row = pos[i];
-          var col = pos[j];
-
-          if (_modules[row][col] != null) {
-            continue;
-          }
-
-          for (var r = -2; r <= 2; r += 1) {
-
-            for (var c = -2; c <= 2; c += 1) {
-
-              if (r == -2 || r == 2 || c == -2 || c == 2
-                  || (r == 0 && c == 0) ) {
-                _modules[row + r][col + c] = true;
-              } else {
-                _modules[row + r][col + c] = false;
-              }
-            }
-          }
-        }
-      }
-    };
-
-    var setupTypeNumber = function(test) {
-
-      var bits = QRUtil.getBCHTypeNumber(_typeNumber);
-
-      for (var i = 0; i < 18; i += 1) {
-        var mod = (!test && ( (bits >> i) & 1) == 1);
-        _modules[Math.floor(i / 3)][i % 3 + _moduleCount - 8 - 3] = mod;
-      }
-
-      for (var i = 0; i < 18; i += 1) {
-        var mod = (!test && ( (bits >> i) & 1) == 1);
-        _modules[i % 3 + _moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
-      }
-    };
-
-    var setupTypeInfo = function(test, maskPattern) {
-
-      var data = (_errorCorrectionLevel << 3) | maskPattern;
-      var bits = QRUtil.getBCHTypeInfo(data);
-
-      // vertical
-      for (var i = 0; i < 15; i += 1) {
-
-        var mod = (!test && ( (bits >> i) & 1) == 1);
-
-        if (i < 6) {
-          _modules[i][8] = mod;
-        } else if (i < 8) {
-          _modules[i + 1][8] = mod;
-        } else {
-          _modules[_moduleCount - 15 + i][8] = mod;
-        }
-      }
-
-      // horizontal
-      for (var i = 0; i < 15; i += 1) {
-
-        var mod = (!test && ( (bits >> i) & 1) == 1);
-
-        if (i < 8) {
-          _modules[8][_moduleCount - i - 1] = mod;
-        } else if (i < 9) {
-          _modules[8][15 - i - 1 + 1] = mod;
-        } else {
-          _modules[8][15 - i - 1] = mod;
-        }
-      }
-
-      // fixed module
-      _modules[_moduleCount - 8][8] = (!test);
-    };
-
-    var mapData = function(data, maskPattern) {
-
-      var inc = -1;
-      var row = _moduleCount - 1;
-      var bitIndex = 7;
-      var byteIndex = 0;
-      var maskFunc = QRUtil.getMaskFunction(maskPattern);
-
-      for (var col = _moduleCount - 1; col > 0; col -= 2) {
-
-        if (col == 6) col -= 1;
-
-        while (true) {
-
-          for (var c = 0; c < 2; c += 1) {
-
-            if (_modules[row][col - c] == null) {
-
-              var dark = false;
-
-              if (byteIndex < data.length) {
-                dark = ( ( (data[byteIndex] >>> bitIndex) & 1) == 1);
-              }
-
-              var mask = maskFunc(row, col - c);
-
-              if (mask) {
-                dark = !dark;
-              }
-
-              _modules[row][col - c] = dark;
-              bitIndex -= 1;
-
-              if (bitIndex == -1) {
-                byteIndex += 1;
-                bitIndex = 7;
-              }
-            }
-          }
-
-          row += inc;
-
-          if (row < 0 || _moduleCount <= row) {
-            row -= inc;
-            inc = -inc;
-            break;
-          }
-        }
-      }
-    };
-
-    var createBytes = function(buffer, rsBlocks) {
-
-      var offset = 0;
-
-      var maxDcCount = 0;
-      var maxEcCount = 0;
-
-      var dcdata = new Array(rsBlocks.length);
-      var ecdata = new Array(rsBlocks.length);
-
-      for (var r = 0; r < rsBlocks.length; r += 1) {
-
-        var dcCount = rsBlocks[r].dataCount;
-        var ecCount = rsBlocks[r].totalCount - dcCount;
-
-        maxDcCount = Math.max(maxDcCount, dcCount);
-        maxEcCount = Math.max(maxEcCount, ecCount);
-
-        dcdata[r] = new Array(dcCount);
-
-        for (var i = 0; i < dcdata[r].length; i += 1) {
-          dcdata[r][i] = 0xff & buffer.getBuffer()[i + offset];
-        }
-        offset += dcCount;
-
-        var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
-        var rawPoly = qrPolynomial(dcdata[r], rsPoly.getLength() - 1);
-
-        var modPoly = rawPoly.mod(rsPoly);
-        ecdata[r] = new Array(rsPoly.getLength() - 1);
-        for (var i = 0; i < ecdata[r].length; i += 1) {
-          var modIndex = i + modPoly.getLength() - ecdata[r].length;
-          ecdata[r][i] = (modIndex >= 0)? modPoly.getAt(modIndex) : 0;
-        }
-      }
-
-      var totalCodeCount = 0;
-      for (var i = 0; i < rsBlocks.length; i += 1) {
-        totalCodeCount += rsBlocks[i].totalCount;
-      }
-
-      var data = new Array(totalCodeCount);
-      var index = 0;
-
-      for (var i = 0; i < maxDcCount; i += 1) {
-        for (var r = 0; r < rsBlocks.length; r += 1) {
-          if (i < dcdata[r].length) {
-            data[index] = dcdata[r][i];
-            index += 1;
-          }
-        }
-      }
-
-      for (var i = 0; i < maxEcCount; i += 1) {
-        for (var r = 0; r < rsBlocks.length; r += 1) {
-          if (i < ecdata[r].length) {
-            data[index] = ecdata[r][i];
-            index += 1;
-          }
-        }
-      }
-
-      return data;
-    };
-
-    var createData = function(typeNumber, errorCorrectionLevel, dataList) {
-
-      var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectionLevel);
-
-      var buffer = qrBitBuffer();
-
-      for (var i = 0; i < dataList.length; i += 1) {
-        var data = dataList[i];
-        buffer.put(data.getMode(), 4);
-        buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
-        data.write(buffer);
-      }
-
-      // calc num max data.
-      var totalDataCount = 0;
-      for (var i = 0; i < rsBlocks.length; i += 1) {
-        totalDataCount += rsBlocks[i].dataCount;
-      }
-
-      if (buffer.getLengthInBits() > totalDataCount * 8) {
-        throw 'code length overflow. ('
-          + buffer.getLengthInBits()
-          + '>'
-          + totalDataCount * 8
-          + ')';
-      }
-
-      // end code
-      if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
-        buffer.put(0, 4);
-      }
-
-      // padding
-      while (buffer.getLengthInBits() % 8 != 0) {
-        buffer.putBit(false);
-      }
-
-      // padding
-      while (true) {
-
-        if (buffer.getLengthInBits() >= totalDataCount * 8) {
-          break;
-        }
-        buffer.put(PAD0, 8);
-
-        if (buffer.getLengthInBits() >= totalDataCount * 8) {
-          break;
-        }
-        buffer.put(PAD1, 8);
-      }
-
-      return createBytes(buffer, rsBlocks);
-    };
-
-    _this.addData = function(data, mode) {
-
-      mode = mode || 'Byte';
-
-      var newData = null;
-
-      switch(mode) {
-      case 'Numeric' :
-        newData = qrNumber(data);
-        break;
-      case 'Alphanumeric' :
-        newData = qrAlphaNum(data);
-        break;
-      case 'Byte' :
-        newData = qr8BitByte(data);
-        break;
-      case 'Kanji' :
-        newData = qrKanji(data);
-        break;
-      default :
-        throw 'mode:' + mode;
-      }
-
-      _dataList.push(newData);
-      _dataCache = null;
-    };
-
-    _this.isDark = function(row, col) {
-      if (row < 0 || _moduleCount <= row || col < 0 || _moduleCount <= col) {
-        throw row + ',' + col;
-      }
-      return _modules[row][col];
-    };
-
-    _this.getModuleCount = function() {
-      return _moduleCount;
-    };
-
-    _this.make = function() {
-      if (_typeNumber < 1) {
-        var typeNumber = 1;
-
-        for (; typeNumber < 40; typeNumber++) {
-          var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, _errorCorrectionLevel);
-          var buffer = qrBitBuffer();
-
-          for (var i = 0; i < _dataList.length; i++) {
-            var data = _dataList[i];
-            buffer.put(data.getMode(), 4);
-            buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
-            data.write(buffer);
-          }
-
-          var totalDataCount = 0;
-          for (var i = 0; i < rsBlocks.length; i++) {
-            totalDataCount += rsBlocks[i].dataCount;
-          }
-
-          if (buffer.getLengthInBits() <= totalDataCount * 8) {
-            break;
-          }
-        }
-
-        _typeNumber = typeNumber;
-      }
-
-      makeImpl(false, getBestMaskPattern() );
-    };
-
-    _this.createTableTag = function(cellSize, margin) {
-
-      cellSize = cellSize || 2;
-      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
-
-      var qrHtml = '';
-
-      qrHtml += '<table style="';
-      qrHtml += ' border-width: 0px; border-style: none;';
-      qrHtml += ' border-collapse: collapse;';
-      qrHtml += ' padding: 0px; margin: ' + margin + 'px;';
-      qrHtml += '">';
-      qrHtml += '<tbody>';
-
-      for (var r = 0; r < _this.getModuleCount(); r += 1) {
-
-        qrHtml += '<tr>';
-
-        for (var c = 0; c < _this.getModuleCount(); c += 1) {
-          qrHtml += '<td style="';
-          qrHtml += ' border-width: 0px; border-style: none;';
-          qrHtml += ' border-collapse: collapse;';
-          qrHtml += ' padding: 0px; margin: 0px;';
-          qrHtml += ' width: ' + cellSize + 'px;';
-          qrHtml += ' height: ' + cellSize + 'px;';
-          qrHtml += ' background-color: ';
-          qrHtml += _this.isDark(r, c)? '#000000' : '#ffffff';
-          qrHtml += ';';
-          qrHtml += '"/>';
-        }
-
-        qrHtml += '</tr>';
-      }
-
-      qrHtml += '</tbody>';
-      qrHtml += '</table>';
-
-      return qrHtml;
-    };
-
-    _this.createSvgTag = function(cellSize, margin, alt, title) {
-
-      var opts = {};
-      if (typeof arguments[0] == 'object') {
-        // Called by options.
-        opts = arguments[0];
-        // overwrite cellSize and margin.
-        cellSize = opts.cellSize;
-        margin = opts.margin;
-        alt = opts.alt;
-        title = opts.title;
-      }
-
-      cellSize = cellSize || 2;
-      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
-
-      // Compose alt property surrogate
-      alt = (typeof alt === 'string') ? {text: alt} : alt || {};
-      alt.text = alt.text || null;
-      alt.id = (alt.text) ? alt.id || 'qrcode-description' : null;
-
-      // Compose title property surrogate
-      title = (typeof title === 'string') ? {text: title} : title || {};
-      title.text = title.text || null;
-      title.id = (title.text) ? title.id || 'qrcode-title' : null;
-
-      var size = _this.getModuleCount() * cellSize + margin * 2;
-      var c, mc, r, mr, qrSvg='', rect;
-
-      rect = 'l' + cellSize + ',0 0,' + cellSize +
-        ' -' + cellSize + ',0 0,-' + cellSize + 'z ';
-
-      qrSvg += '<svg version="1.1" xmlns="http://www.w3.org/2000/svg"';
-      qrSvg += !opts.scalable ? ' width="' + size + 'px" height="' + size + 'px"' : '';
-      qrSvg += ' viewBox="0 0 ' + size + ' ' + size + '" ';
-      qrSvg += ' preserveAspectRatio="xMinYMin meet"';
-      qrSvg += (title.text || alt.text) ? ' role="img" aria-labelledby="' +
-          escapeXml([title.id, alt.id].join(' ').trim() ) + '"' : '';
-      qrSvg += '>';
-      qrSvg += (title.text) ? '<title id="' + escapeXml(title.id) + '">' +
-          escapeXml(title.text) + '</title>' : '';
-      qrSvg += (alt.text) ? '<description id="' + escapeXml(alt.id) + '">' +
-          escapeXml(alt.text) + '</description>' : '';
-      qrSvg += '<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>';
-      qrSvg += '<path d="';
-
-      for (r = 0; r < _this.getModuleCount(); r += 1) {
-        mr = r * cellSize + margin;
-        for (c = 0; c < _this.getModuleCount(); c += 1) {
-          if (_this.isDark(r, c) ) {
-            mc = c*cellSize+margin;
-            qrSvg += 'M' + mc + ',' + mr + rect;
-          }
-        }
-      }
-
-      qrSvg += '" stroke="transparent" fill="black"/>';
-      qrSvg += '</svg>';
-
-      return qrSvg;
-    };
-
-    _this.createDataURL = function(cellSize, margin) {
-
-      cellSize = cellSize || 2;
-      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
-
-      var size = _this.getModuleCount() * cellSize + margin * 2;
-      var min = margin;
-      var max = size - margin;
-
-      return createDataURL(size, size, function(x, y) {
-        if (min <= x && x < max && min <= y && y < max) {
-          var c = Math.floor( (x - min) / cellSize);
-          var r = Math.floor( (y - min) / cellSize);
-          return _this.isDark(r, c)? 0 : 1;
-        } else {
-          return 1;
-        }
-      } );
-    };
-
-    _this.createImgTag = function(cellSize, margin, alt) {
-
-      cellSize = cellSize || 2;
-      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
-
-      var size = _this.getModuleCount() * cellSize + margin * 2;
-
-      var img = '';
-      img += '<img';
-      img += '\u0020src="';
-      img += _this.createDataURL(cellSize, margin);
-      img += '"';
-      img += '\u0020width="';
-      img += size;
-      img += '"';
-      img += '\u0020height="';
-      img += size;
-      img += '"';
-      if (alt) {
-        img += '\u0020alt="';
-        img += escapeXml(alt);
-        img += '"';
-      }
-      img += '/>';
-
-      return img;
-    };
-
-    var escapeXml = function(s) {
-      var escaped = '';
-      for (var i = 0; i < s.length; i += 1) {
-        var c = s.charAt(i);
-        switch(c) {
-        case '<': escaped += '&lt;'; break;
-        case '>': escaped += '&gt;'; break;
-        case '&': escaped += '&amp;'; break;
-        case '"': escaped += '&quot;'; break;
-        default : escaped += c; break;
-        }
-      }
-      return escaped;
-    };
-
-    var _createHalfASCII = function(margin) {
-      var cellSize = 1;
-      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
-
-      var size = _this.getModuleCount() * cellSize + margin * 2;
-      var min = margin;
-      var max = size - margin;
-
-      var y, x, r1, r2, p;
-
-      var blocks = {
-        '██': '█',
-        '█ ': '▀',
-        ' █': '▄',
-        '  ': ' '
-      };
-
-      var blocksLastLineNoMargin = {
-        '██': '▀',
-        '█ ': '▀',
-        ' █': ' ',
-        '  ': ' '
-      };
-
-      var ascii = '';
-      for (y = 0; y < size; y += 2) {
-        r1 = Math.floor((y - min) / cellSize);
-        r2 = Math.floor((y + 1 - min) / cellSize);
-        for (x = 0; x < size; x += 1) {
-          p = '█';
-
-          if (min <= x && x < max && min <= y && y < max && _this.isDark(r1, Math.floor((x - min) / cellSize))) {
-            p = ' ';
-          }
-
-          if (min <= x && x < max && min <= y+1 && y+1 < max && _this.isDark(r2, Math.floor((x - min) / cellSize))) {
-            p += ' ';
-          }
-          else {
-            p += '█';
-          }
-
-          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
-          ascii += (margin < 1 && y+1 >= max) ? blocksLastLineNoMargin[p] : blocks[p];
-        }
-
-        ascii += '\n';
-      }
-
-      if (size % 2 && margin > 0) {
-        return ascii.substring(0, ascii.length - size - 1) + Array(size+1).join('▀');
-      }
-
-      return ascii.substring(0, ascii.length-1);
-    };
-
-    _this.createASCII = function(cellSize, margin) {
-      cellSize = cellSize || 1;
-
-      if (cellSize < 2) {
-        return _createHalfASCII(margin);
-      }
-
-      cellSize -= 1;
-      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
-
-      var size = _this.getModuleCount() * cellSize + margin * 2;
-      var min = margin;
-      var max = size - margin;
-
-      var y, x, r, p;
-
-      var white = Array(cellSize+1).join('██');
-      var black = Array(cellSize+1).join('  ');
-
-      var ascii = '';
-      var line = '';
-      for (y = 0; y < size; y += 1) {
-        r = Math.floor( (y - min) / cellSize);
-        line = '';
-        for (x = 0; x < size; x += 1) {
-          p = 1;
-
-          if (min <= x && x < max && min <= y && y < max && _this.isDark(r, Math.floor((x - min) / cellSize))) {
-            p = 0;
-          }
-
-          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
-          line += p ? white : black;
-        }
-
-        for (r = 0; r < cellSize; r += 1) {
-          ascii += line + '\n';
-        }
-      }
-
-      return ascii.substring(0, ascii.length-1);
-    };
-
-    _this.renderTo2dContext = function(context, cellSize) {
-      cellSize = cellSize || 2;
-      var length = _this.getModuleCount();
-      for (var row = 0; row < length; row++) {
-        for (var col = 0; col < length; col++) {
-          context.fillStyle = _this.isDark(row, col) ? 'black' : 'white';
-          context.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
-        }
-      }
-    }
-
-    return _this;
-  };
-
-  //---------------------------------------------------------------------
-  // qrcode.stringToBytes
-  //---------------------------------------------------------------------
-
-  qrcode.stringToBytesFuncs = {
-    'default' : function(s) {
-      var bytes = [];
-      for (var i = 0; i < s.length; i += 1) {
-        var c = s.charCodeAt(i);
-        bytes.push(c & 0xff);
-      }
-      return bytes;
-    }
-  };
-
-  qrcode.stringToBytes = qrcode.stringToBytesFuncs['default'];
-
-  //---------------------------------------------------------------------
-  // qrcode.createStringToBytes
-  //---------------------------------------------------------------------
-
-  /**
-   * @param unicodeData base64 string of byte array.
-   * [16bit Unicode],[16bit Bytes], ...
-   * @param numChars
-   */
-  qrcode.createStringToBytes = function(unicodeData, numChars) {
-
-    // create conversion map.
-
-    var unicodeMap = function() {
-
-      var bin = base64DecodeInputStream(unicodeData);
-      var read = function() {
-        var b = bin.read();
-        if (b == -1) throw 'eof';
-        return b;
-      };
-
-      var count = 0;
-      var unicodeMap = {};
-      while (true) {
-        var b0 = bin.read();
-        if (b0 == -1) break;
-        var b1 = read();
-        var b2 = read();
-        var b3 = read();
-        var k = String.fromCharCode( (b0 << 8) | b1);
-        var v = (b2 << 8) | b3;
-        unicodeMap[k] = v;
-        count += 1;
-      }
-      if (count != numChars) {
-        throw count + ' != ' + numChars;
-      }
-
-      return unicodeMap;
-    }();
-
-    var unknownChar = '?'.charCodeAt(0);
-
-    return function(s) {
-      var bytes = [];
-      for (var i = 0; i < s.length; i += 1) {
-        var c = s.charCodeAt(i);
-        if (c < 128) {
-          bytes.push(c);
-        } else {
-          var b = unicodeMap[s.charAt(i)];
-          if (typeof b == 'number') {
-            if ( (b & 0xff) == b) {
-              // 1byte
-              bytes.push(b);
-            } else {
-              // 2bytes
-              bytes.push(b >>> 8);
-              bytes.push(b & 0xff);
-            }
-          } else {
-            bytes.push(unknownChar);
-          }
-        }
-      }
-      return bytes;
-    };
-  };
-
-  //---------------------------------------------------------------------
-  // QRMode
-  //---------------------------------------------------------------------
-
-  var QRMode = {
-    MODE_NUMBER :    1 << 0,
-    MODE_ALPHA_NUM : 1 << 1,
-    MODE_8BIT_BYTE : 1 << 2,
-    MODE_KANJI :     1 << 3
-  };
-
-  //---------------------------------------------------------------------
-  // QRErrorCorrectionLevel
-  //---------------------------------------------------------------------
-
-  var QRErrorCorrectionLevel = {
-    L : 1,
-    M : 0,
-    Q : 3,
-    H : 2
-  };
-
-  //---------------------------------------------------------------------
-  // QRMaskPattern
-  //---------------------------------------------------------------------
-
-  var QRMaskPattern = {
-    PATTERN000 : 0,
-    PATTERN001 : 1,
-    PATTERN010 : 2,
-    PATTERN011 : 3,
-    PATTERN100 : 4,
-    PATTERN101 : 5,
-    PATTERN110 : 6,
-    PATTERN111 : 7
-  };
-
-  //---------------------------------------------------------------------
-  // QRUtil
-  //---------------------------------------------------------------------
-
-  var QRUtil = function() {
-
-    var PATTERN_POSITION_TABLE = [
-      [],
-      [6, 18],
-      [6, 22],
-      [6, 26],
-      [6, 30],
-      [6, 34],
-      [6, 22, 38],
-      [6, 24, 42],
-      [6, 26, 46],
-      [6, 28, 50],
-      [6, 30, 54],
-      [6, 32, 58],
-      [6, 34, 62],
-      [6, 26, 46, 66],
-      [6, 26, 48, 70],
-      [6, 26, 50, 74],
-      [6, 30, 54, 78],
-      [6, 30, 56, 82],
-      [6, 30, 58, 86],
-      [6, 34, 62, 90],
-      [6, 28, 50, 72, 94],
-      [6, 26, 50, 74, 98],
-      [6, 30, 54, 78, 102],
-      [6, 28, 54, 80, 106],
-      [6, 32, 58, 84, 110],
-      [6, 30, 58, 86, 114],
-      [6, 34, 62, 90, 118],
-      [6, 26, 50, 74, 98, 122],
-      [6, 30, 54, 78, 102, 126],
-      [6, 26, 52, 78, 104, 130],
-      [6, 30, 56, 82, 108, 134],
-      [6, 34, 60, 86, 112, 138],
-      [6, 30, 58, 86, 114, 142],
-      [6, 34, 62, 90, 118, 146],
-      [6, 30, 54, 78, 102, 126, 150],
-      [6, 24, 50, 76, 102, 128, 154],
-      [6, 28, 54, 80, 106, 132, 158],
-      [6, 32, 58, 84, 110, 136, 162],
-      [6, 26, 54, 82, 110, 138, 166],
-      [6, 30, 58, 86, 114, 142, 170]
-    ];
-    var G15 = (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0);
-    var G18 = (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0);
-    var G15_MASK = (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1);
-
-    var _this = {};
-
-    var getBCHDigit = function(data) {
-      var digit = 0;
-      while (data != 0) {
-        digit += 1;
-        data >>>= 1;
-      }
-      return digit;
-    };
-
-    _this.getBCHTypeInfo = function(data) {
-      var d = data << 10;
-      while (getBCHDigit(d) - getBCHDigit(G15) >= 0) {
-        d ^= (G15 << (getBCHDigit(d) - getBCHDigit(G15) ) );
-      }
-      return ( (data << 10) | d) ^ G15_MASK;
-    };
-
-    _this.getBCHTypeNumber = function(data) {
-      var d = data << 12;
-      while (getBCHDigit(d) - getBCHDigit(G18) >= 0) {
-        d ^= (G18 << (getBCHDigit(d) - getBCHDigit(G18) ) );
-      }
-      return (data << 12) | d;
-    };
-
-    _this.getPatternPosition = function(typeNumber) {
-      return PATTERN_POSITION_TABLE[typeNumber - 1];
-    };
-
-    _this.getMaskFunction = function(maskPattern) {
-
-      switch (maskPattern) {
-
-      case QRMaskPattern.PATTERN000 :
-        return function(i, j) { return (i + j) % 2 == 0; };
-      case QRMaskPattern.PATTERN001 :
-        return function(i, j) { return i % 2 == 0; };
-      case QRMaskPattern.PATTERN010 :
-        return function(i, j) { return j % 3 == 0; };
-      case QRMaskPattern.PATTERN011 :
-        return function(i, j) { return (i + j) % 3 == 0; };
-      case QRMaskPattern.PATTERN100 :
-        return function(i, j) { return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 == 0; };
-      case QRMaskPattern.PATTERN101 :
-        return function(i, j) { return (i * j) % 2 + (i * j) % 3 == 0; };
-      case QRMaskPattern.PATTERN110 :
-        return function(i, j) { return ( (i * j) % 2 + (i * j) % 3) % 2 == 0; };
-      case QRMaskPattern.PATTERN111 :
-        return function(i, j) { return ( (i * j) % 3 + (i + j) % 2) % 2 == 0; };
-
-      default :
-        throw 'bad maskPattern:' + maskPattern;
-      }
-    };
-
-    _this.getErrorCorrectPolynomial = function(errorCorrectLength) {
-      var a = qrPolynomial([1], 0);
-      for (var i = 0; i < errorCorrectLength; i += 1) {
-        a = a.multiply(qrPolynomial([1, QRMath.gexp(i)], 0) );
-      }
-      return a;
-    };
-
-    _this.getLengthInBits = function(mode, type) {
-
-      if (1 <= type && type < 10) {
-
-        // 1 - 9
-
-        switch(mode) {
-        case QRMode.MODE_NUMBER    : return 10;
-        case QRMode.MODE_ALPHA_NUM : return 9;
-        case QRMode.MODE_8BIT_BYTE : return 8;
-        case QRMode.MODE_KANJI     : return 8;
-        default :
-          throw 'mode:' + mode;
-        }
-
-      } else if (type < 27) {
-
-        // 10 - 26
-
-        switch(mode) {
-        case QRMode.MODE_NUMBER    : return 12;
-        case QRMode.MODE_ALPHA_NUM : return 11;
-        case QRMode.MODE_8BIT_BYTE : return 16;
-        case QRMode.MODE_KANJI     : return 10;
-        default :
-          throw 'mode:' + mode;
-        }
-
-      } else if (type < 41) {
-
-        // 27 - 40
-
-        switch(mode) {
-        case QRMode.MODE_NUMBER    : return 14;
-        case QRMode.MODE_ALPHA_NUM : return 13;
-        case QRMode.MODE_8BIT_BYTE : return 16;
-        case QRMode.MODE_KANJI     : return 12;
-        default :
-          throw 'mode:' + mode;
-        }
-
-      } else {
-        throw 'type:' + type;
-      }
-    };
-
-    _this.getLostPoint = function(qrcode) {
-
-      var moduleCount = qrcode.getModuleCount();
-
-      var lostPoint = 0;
-
-      // LEVEL1
-
-      for (var row = 0; row < moduleCount; row += 1) {
-        for (var col = 0; col < moduleCount; col += 1) {
-
-          var sameCount = 0;
-          var dark = qrcode.isDark(row, col);
-
-          for (var r = -1; r <= 1; r += 1) {
-
-            if (row + r < 0 || moduleCount <= row + r) {
-              continue;
-            }
-
-            for (var c = -1; c <= 1; c += 1) {
-
-              if (col + c < 0 || moduleCount <= col + c) {
-                continue;
-              }
-
-              if (r == 0 && c == 0) {
-                continue;
-              }
-
-              if (dark == qrcode.isDark(row + r, col + c) ) {
-                sameCount += 1;
-              }
-            }
-          }
-
-          if (sameCount > 5) {
-            lostPoint += (3 + sameCount - 5);
-          }
-        }
-      };
-
-      // LEVEL2
-
-      for (var row = 0; row < moduleCount - 1; row += 1) {
-        for (var col = 0; col < moduleCount - 1; col += 1) {
-          var count = 0;
-          if (qrcode.isDark(row, col) ) count += 1;
-          if (qrcode.isDark(row + 1, col) ) count += 1;
-          if (qrcode.isDark(row, col + 1) ) count += 1;
-          if (qrcode.isDark(row + 1, col + 1) ) count += 1;
-          if (count == 0 || count == 4) {
-            lostPoint += 3;
-          }
-        }
-      }
-
-      // LEVEL3
-
-      for (var row = 0; row < moduleCount; row += 1) {
-        for (var col = 0; col < moduleCount - 6; col += 1) {
-          if (qrcode.isDark(row, col)
-              && !qrcode.isDark(row, col + 1)
-              &&  qrcode.isDark(row, col + 2)
-              &&  qrcode.isDark(row, col + 3)
-              &&  qrcode.isDark(row, col + 4)
-              && !qrcode.isDark(row, col + 5)
-              &&  qrcode.isDark(row, col + 6) ) {
-            lostPoint += 40;
-          }
-        }
-      }
-
-      for (var col = 0; col < moduleCount; col += 1) {
-        for (var row = 0; row < moduleCount - 6; row += 1) {
-          if (qrcode.isDark(row, col)
-              && !qrcode.isDark(row + 1, col)
-              &&  qrcode.isDark(row + 2, col)
-              &&  qrcode.isDark(row + 3, col)
-              &&  qrcode.isDark(row + 4, col)
-              && !qrcode.isDark(row + 5, col)
-              &&  qrcode.isDark(row + 6, col) ) {
-            lostPoint += 40;
-          }
-        }
-      }
-
-      // LEVEL4
-
-      var darkCount = 0;
-
-      for (var col = 0; col < moduleCount; col += 1) {
-        for (var row = 0; row < moduleCount; row += 1) {
-          if (qrcode.isDark(row, col) ) {
-            darkCount += 1;
-          }
-        }
-      }
-
-      var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
-      lostPoint += ratio * 10;
-
-      return lostPoint;
-    };
-
-    return _this;
-  }();
-
-  //---------------------------------------------------------------------
-  // QRMath
-  //---------------------------------------------------------------------
-
-  var QRMath = function() {
-
-    var EXP_TABLE = new Array(256);
-    var LOG_TABLE = new Array(256);
-
-    // initialize tables
-    for (var i = 0; i < 8; i += 1) {
-      EXP_TABLE[i] = 1 << i;
-    }
-    for (var i = 8; i < 256; i += 1) {
-      EXP_TABLE[i] = EXP_TABLE[i - 4]
-        ^ EXP_TABLE[i - 5]
-        ^ EXP_TABLE[i - 6]
-        ^ EXP_TABLE[i - 8];
-    }
-    for (var i = 0; i < 255; i += 1) {
-      LOG_TABLE[EXP_TABLE[i] ] = i;
-    }
-
-    var _this = {};
-
-    _this.glog = function(n) {
-
-      if (n < 1) {
-        throw 'glog(' + n + ')';
-      }
-
-      return LOG_TABLE[n];
-    };
-
-    _this.gexp = function(n) {
-
-      while (n < 0) {
-        n += 255;
-      }
-
-      while (n >= 256) {
-        n -= 255;
-      }
-
-      return EXP_TABLE[n];
-    };
-
-    return _this;
-  }();
-
-  //---------------------------------------------------------------------
-  // qrPolynomial
-  //---------------------------------------------------------------------
-
-  function qrPolynomial(num, shift) {
-
-    if (typeof num.length == 'undefined') {
-      throw num.length + '/' + shift;
-    }
-
-    var _num = function() {
-      var offset = 0;
-      while (offset < num.length && num[offset] == 0) {
-        offset += 1;
-      }
-      var _num = new Array(num.length - offset + shift);
-      for (var i = 0; i < num.length - offset; i += 1) {
-        _num[i] = num[i + offset];
-      }
-      return _num;
-    }();
-
-    var _this = {};
-
-    _this.getAt = function(index) {
-      return _num[index];
-    };
-
-    _this.getLength = function() {
-      return _num.length;
-    };
-
-    _this.multiply = function(e) {
-
-      var num = new Array(_this.getLength() + e.getLength() - 1);
-
-      for (var i = 0; i < _this.getLength(); i += 1) {
-        for (var j = 0; j < e.getLength(); j += 1) {
-          num[i + j] ^= QRMath.gexp(QRMath.glog(_this.getAt(i) ) + QRMath.glog(e.getAt(j) ) );
-        }
-      }
-
-      return qrPolynomial(num, 0);
-    };
-
-    _this.mod = function(e) {
-
-      if (_this.getLength() - e.getLength() < 0) {
-        return _this;
-      }
-
-      var ratio = QRMath.glog(_this.getAt(0) ) - QRMath.glog(e.getAt(0) );
-
-      var num = new Array(_this.getLength() );
-      for (var i = 0; i < _this.getLength(); i += 1) {
-        num[i] = _this.getAt(i);
-      }
-
-      for (var i = 0; i < e.getLength(); i += 1) {
-        num[i] ^= QRMath.gexp(QRMath.glog(e.getAt(i) ) + ratio);
-      }
-
-      // recursive call
-      return qrPolynomial(num, 0).mod(e);
-    };
-
-    return _this;
-  };
-
-  //---------------------------------------------------------------------
-  // QRRSBlock
-  //---------------------------------------------------------------------
-
-  var QRRSBlock = function() {
-
-    var RS_BLOCK_TABLE = [
-
-      // L
-      // M
-      // Q
-      // H
-
-      // 1
-      [1, 26, 19],
-      [1, 26, 16],
-      [1, 26, 13],
-      [1, 26, 9],
-
-      // 2
-      [1, 44, 34],
-      [1, 44, 28],
-      [1, 44, 22],
-      [1, 44, 16],
-
-      // 3
-      [1, 70, 55],
-      [1, 70, 44],
-      [2, 35, 17],
-      [2, 35, 13],
-
-      // 4
-      [1, 100, 80],
-      [2, 50, 32],
-      [2, 50, 24],
-      [4, 25, 9],
-
-      // 5
-      [1, 134, 108],
-      [2, 67, 43],
-      [2, 33, 15, 2, 34, 16],
-      [2, 33, 11, 2, 34, 12],
-
-      // 6
-      [2, 86, 68],
-      [4, 43, 27],
-      [4, 43, 19],
-      [4, 43, 15],
-
-      // 7
-      [2, 98, 78],
-      [4, 49, 31],
-      [2, 32, 14, 4, 33, 15],
-      [4, 39, 13, 1, 40, 14],
-
-      // 8
-      [2, 121, 97],
-      [2, 60, 38, 2, 61, 39],
-      [4, 40, 18, 2, 41, 19],
-      [4, 40, 14, 2, 41, 15],
-
-      // 9
-      [2, 146, 116],
-      [3, 58, 36, 2, 59, 37],
-      [4, 36, 16, 4, 37, 17],
-      [4, 36, 12, 4, 37, 13],
-
-      // 10
-      [2, 86, 68, 2, 87, 69],
-      [4, 69, 43, 1, 70, 44],
-      [6, 43, 19, 2, 44, 20],
-      [6, 43, 15, 2, 44, 16],
-
-      // 11
-      [4, 101, 81],
-      [1, 80, 50, 4, 81, 51],
-      [4, 50, 22, 4, 51, 23],
-      [3, 36, 12, 8, 37, 13],
-
-      // 12
-      [2, 116, 92, 2, 117, 93],
-      [6, 58, 36, 2, 59, 37],
-      [4, 46, 20, 6, 47, 21],
-      [7, 42, 14, 4, 43, 15],
-
-      // 13
-      [4, 133, 107],
-      [8, 59, 37, 1, 60, 38],
-      [8, 44, 20, 4, 45, 21],
-      [12, 33, 11, 4, 34, 12],
-
-      // 14
-      [3, 145, 115, 1, 146, 116],
-      [4, 64, 40, 5, 65, 41],
-      [11, 36, 16, 5, 37, 17],
-      [11, 36, 12, 5, 37, 13],
-
-      // 15
-      [5, 109, 87, 1, 110, 88],
-      [5, 65, 41, 5, 66, 42],
-      [5, 54, 24, 7, 55, 25],
-      [11, 36, 12, 7, 37, 13],
-
-      // 16
-      [5, 122, 98, 1, 123, 99],
-      [7, 73, 45, 3, 74, 46],
-      [15, 43, 19, 2, 44, 20],
-      [3, 45, 15, 13, 46, 16],
-
-      // 17
-      [1, 135, 107, 5, 136, 108],
-      [10, 74, 46, 1, 75, 47],
-      [1, 50, 22, 15, 51, 23],
-      [2, 42, 14, 17, 43, 15],
-
-      // 18
-      [5, 150, 120, 1, 151, 121],
-      [9, 69, 43, 4, 70, 44],
-      [17, 50, 22, 1, 51, 23],
-      [2, 42, 14, 19, 43, 15],
-
-      // 19
-      [3, 141, 113, 4, 142, 114],
-      [3, 70, 44, 11, 71, 45],
-      [17, 47, 21, 4, 48, 22],
-      [9, 39, 13, 16, 40, 14],
-
-      // 20
-      [3, 135, 107, 5, 136, 108],
-      [3, 67, 41, 13, 68, 42],
-      [15, 54, 24, 5, 55, 25],
-      [15, 43, 15, 10, 44, 16],
-
-      // 21
-      [4, 144, 116, 4, 145, 117],
-      [17, 68, 42],
-      [17, 50, 22, 6, 51, 23],
-      [19, 46, 16, 6, 47, 17],
-
-      // 22
-      [2, 139, 111, 7, 140, 112],
-      [17, 74, 46],
-      [7, 54, 24, 16, 55, 25],
-      [34, 37, 13],
-
-      // 23
-      [4, 151, 121, 5, 152, 122],
-      [4, 75, 47, 14, 76, 48],
-      [11, 54, 24, 14, 55, 25],
-      [16, 45, 15, 14, 46, 16],
-
-      // 24
-      [6, 147, 117, 4, 148, 118],
-      [6, 73, 45, 14, 74, 46],
-      [11, 54, 24, 16, 55, 25],
-      [30, 46, 16, 2, 47, 17],
-
-      // 25
-      [8, 132, 106, 4, 133, 107],
-      [8, 75, 47, 13, 76, 48],
-      [7, 54, 24, 22, 55, 25],
-      [22, 45, 15, 13, 46, 16],
-
-      // 26
-      [10, 142, 114, 2, 143, 115],
-      [19, 74, 46, 4, 75, 47],
-      [28, 50, 22, 6, 51, 23],
-      [33, 46, 16, 4, 47, 17],
-
-      // 27
-      [8, 152, 122, 4, 153, 123],
-      [22, 73, 45, 3, 74, 46],
-      [8, 53, 23, 26, 54, 24],
-      [12, 45, 15, 28, 46, 16],
-
-      // 28
-      [3, 147, 117, 10, 148, 118],
-      [3, 73, 45, 23, 74, 46],
-      [4, 54, 24, 31, 55, 25],
-      [11, 45, 15, 31, 46, 16],
-
-      // 29
-      [7, 146, 116, 7, 147, 117],
-      [21, 73, 45, 7, 74, 46],
-      [1, 53, 23, 37, 54, 24],
-      [19, 45, 15, 26, 46, 16],
-
-      // 30
-      [5, 145, 115, 10, 146, 116],
-      [19, 75, 47, 10, 76, 48],
-      [15, 54, 24, 25, 55, 25],
-      [23, 45, 15, 25, 46, 16],
-
-      // 31
-      [13, 145, 115, 3, 146, 116],
-      [2, 74, 46, 29, 75, 47],
-      [42, 54, 24, 1, 55, 25],
-      [23, 45, 15, 28, 46, 16],
-
-      // 32
-      [17, 145, 115],
-      [10, 74, 46, 23, 75, 47],
-      [10, 54, 24, 35, 55, 25],
-      [19, 45, 15, 35, 46, 16],
-
-      // 33
-      [17, 145, 115, 1, 146, 116],
-      [14, 74, 46, 21, 75, 47],
-      [29, 54, 24, 19, 55, 25],
-      [11, 45, 15, 46, 46, 16],
-
-      // 34
-      [13, 145, 115, 6, 146, 116],
-      [14, 74, 46, 23, 75, 47],
-      [44, 54, 24, 7, 55, 25],
-      [59, 46, 16, 1, 47, 17],
-
-      // 35
-      [12, 151, 121, 7, 152, 122],
-      [12, 75, 47, 26, 76, 48],
-      [39, 54, 24, 14, 55, 25],
-      [22, 45, 15, 41, 46, 16],
-
-      // 36
-      [6, 151, 121, 14, 152, 122],
-      [6, 75, 47, 34, 76, 48],
-      [46, 54, 24, 10, 55, 25],
-      [2, 45, 15, 64, 46, 16],
-
-      // 37
-      [17, 152, 122, 4, 153, 123],
-      [29, 74, 46, 14, 75, 47],
-      [49, 54, 24, 10, 55, 25],
-      [24, 45, 15, 46, 46, 16],
-
-      // 38
-      [4, 152, 122, 18, 153, 123],
-      [13, 74, 46, 32, 75, 47],
-      [48, 54, 24, 14, 55, 25],
-      [42, 45, 15, 32, 46, 16],
-
-      // 39
-      [20, 147, 117, 4, 148, 118],
-      [40, 75, 47, 7, 76, 48],
-      [43, 54, 24, 22, 55, 25],
-      [10, 45, 15, 67, 46, 16],
-
-      // 40
-      [19, 148, 118, 6, 149, 119],
-      [18, 75, 47, 31, 76, 48],
-      [34, 54, 24, 34, 55, 25],
-      [20, 45, 15, 61, 46, 16]
-    ];
-
-    var qrRSBlock = function(totalCount, dataCount) {
-      var _this = {};
-      _this.totalCount = totalCount;
-      _this.dataCount = dataCount;
-      return _this;
-    };
-
-    var _this = {};
-
-    var getRsBlockTable = function(typeNumber, errorCorrectionLevel) {
-
-      switch(errorCorrectionLevel) {
-      case QRErrorCorrectionLevel.L :
-        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
-      case QRErrorCorrectionLevel.M :
-        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
-      case QRErrorCorrectionLevel.Q :
-        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
-      case QRErrorCorrectionLevel.H :
-        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
-      default :
-        return undefined;
-      }
-    };
-
-    _this.getRSBlocks = function(typeNumber, errorCorrectionLevel) {
-
-      var rsBlock = getRsBlockTable(typeNumber, errorCorrectionLevel);
-
-      if (typeof rsBlock == 'undefined') {
-        throw 'bad rs block @ typeNumber:' + typeNumber +
-            '/errorCorrectionLevel:' + errorCorrectionLevel;
-      }
-
-      var length = rsBlock.length / 3;
-
-      var list = [];
-
-      for (var i = 0; i < length; i += 1) {
-
-        var count = rsBlock[i * 3 + 0];
-        var totalCount = rsBlock[i * 3 + 1];
-        var dataCount = rsBlock[i * 3 + 2];
-
-        for (var j = 0; j < count; j += 1) {
-          list.push(qrRSBlock(totalCount, dataCount) );
-        }
-      }
-
-      return list;
-    };
-
-    return _this;
-  }();
-
-  //---------------------------------------------------------------------
-  // qrBitBuffer
-  //---------------------------------------------------------------------
-
-  var qrBitBuffer = function() {
-
-    var _buffer = [];
-    var _length = 0;
-
-    var _this = {};
-
-    _this.getBuffer = function() {
-      return _buffer;
-    };
-
-    _this.getAt = function(index) {
-      var bufIndex = Math.floor(index / 8);
-      return ( (_buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
-    };
-
-    _this.put = function(num, length) {
-      for (var i = 0; i < length; i += 1) {
-        _this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
-      }
-    };
-
-    _this.getLengthInBits = function() {
-      return _length;
-    };
-
-    _this.putBit = function(bit) {
-
-      var bufIndex = Math.floor(_length / 8);
-      if (_buffer.length <= bufIndex) {
-        _buffer.push(0);
-      }
-
-      if (bit) {
-        _buffer[bufIndex] |= (0x80 >>> (_length % 8) );
-      }
-
-      _length += 1;
-    };
-
-    return _this;
-  };
-
-  //---------------------------------------------------------------------
-  // qrNumber
-  //---------------------------------------------------------------------
-
-  var qrNumber = function(data) {
-
-    var _mode = QRMode.MODE_NUMBER;
-    var _data = data;
-
-    var _this = {};
-
-    _this.getMode = function() {
-      return _mode;
-    };
-
-    _this.getLength = function(buffer) {
-      return _data.length;
-    };
-
-    _this.write = function(buffer) {
-
-      var data = _data;
-
-      var i = 0;
-
-      while (i + 2 < data.length) {
-        buffer.put(strToNum(data.substring(i, i + 3) ), 10);
-        i += 3;
-      }
-
-      if (i < data.length) {
-        if (data.length - i == 1) {
-          buffer.put(strToNum(data.substring(i, i + 1) ), 4);
-        } else if (data.length - i == 2) {
-          buffer.put(strToNum(data.substring(i, i + 2) ), 7);
-        }
-      }
-    };
-
-    var strToNum = function(s) {
-      var num = 0;
-      for (var i = 0; i < s.length; i += 1) {
-        num = num * 10 + chatToNum(s.charAt(i) );
-      }
-      return num;
-    };
-
-    var chatToNum = function(c) {
-      if ('0' <= c && c <= '9') {
-        return c.charCodeAt(0) - '0'.charCodeAt(0);
-      }
-      throw 'illegal char :' + c;
-    };
-
-    return _this;
-  };
-
-  //---------------------------------------------------------------------
-  // qrAlphaNum
-  //---------------------------------------------------------------------
-
-  var qrAlphaNum = function(data) {
-
-    var _mode = QRMode.MODE_ALPHA_NUM;
-    var _data = data;
-
-    var _this = {};
-
-    _this.getMode = function() {
-      return _mode;
-    };
-
-    _this.getLength = function(buffer) {
-      return _data.length;
-    };
-
-    _this.write = function(buffer) {
-
-      var s = _data;
-
-      var i = 0;
-
-      while (i + 1 < s.length) {
-        buffer.put(
-          getCode(s.charAt(i) ) * 45 +
-          getCode(s.charAt(i + 1) ), 11);
-        i += 2;
-      }
-
-      if (i < s.length) {
-        buffer.put(getCode(s.charAt(i) ), 6);
-      }
-    };
-
-    var getCode = function(c) {
-
-      if ('0' <= c && c <= '9') {
-        return c.charCodeAt(0) - '0'.charCodeAt(0);
-      } else if ('A' <= c && c <= 'Z') {
-        return c.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
-      } else {
-        switch (c) {
-        case ' ' : return 36;
-        case '$' : return 37;
-        case '%' : return 38;
-        case '*' : return 39;
-        case '+' : return 40;
-        case '-' : return 41;
-        case '.' : return 42;
-        case '/' : return 43;
-        case ':' : return 44;
-        default :
-          throw 'illegal char :' + c;
-        }
-      }
-    };
-
-    return _this;
-  };
-
-  //---------------------------------------------------------------------
-  // qr8BitByte
-  //---------------------------------------------------------------------
-
-  var qr8BitByte = function(data) {
-
-    var _mode = QRMode.MODE_8BIT_BYTE;
-    var _data = data;
-    var _bytes = qrcode.stringToBytes(data);
-
-    var _this = {};
-
-    _this.getMode = function() {
-      return _mode;
-    };
-
-    _this.getLength = function(buffer) {
-      return _bytes.length;
-    };
-
-    _this.write = function(buffer) {
-      for (var i = 0; i < _bytes.length; i += 1) {
-        buffer.put(_bytes[i], 8);
-      }
-    };
-
-    return _this;
-  };
-
-  //---------------------------------------------------------------------
-  // qrKanji
-  //---------------------------------------------------------------------
-
-  var qrKanji = function(data) {
-
-    var _mode = QRMode.MODE_KANJI;
-    var _data = data;
-
-    var stringToBytes = qrcode.stringToBytesFuncs['SJIS'];
-    if (!stringToBytes) {
-      throw 'sjis not supported.';
-    }
-    !function(c, code) {
-      // self test for sjis support.
-      var test = stringToBytes(c);
-      if (test.length != 2 || ( (test[0] << 8) | test[1]) != code) {
-        throw 'sjis not supported.';
-      }
-    }('\u53cb', 0x9746);
-
-    var _bytes = stringToBytes(data);
-
-    var _this = {};
-
-    _this.getMode = function() {
-      return _mode;
-    };
-
-    _this.getLength = function(buffer) {
-      return ~~(_bytes.length / 2);
-    };
-
-    _this.write = function(buffer) {
-
-      var data = _bytes;
-
-      var i = 0;
-
-      while (i + 1 < data.length) {
-
-        var c = ( (0xff & data[i]) << 8) | (0xff & data[i + 1]);
-
-        if (0x8140 <= c && c <= 0x9FFC) {
-          c -= 0x8140;
-        } else if (0xE040 <= c && c <= 0xEBBF) {
-          c -= 0xC140;
-        } else {
-          throw 'illegal char at ' + (i + 1) + '/' + c;
-        }
-
-        c = ( (c >>> 8) & 0xff) * 0xC0 + (c & 0xff);
-
-        buffer.put(c, 13);
-
-        i += 2;
-      }
-
-      if (i < data.length) {
-        throw 'illegal char at ' + (i + 1);
-      }
-    };
-
-    return _this;
-  };
-
-  //=====================================================================
-  // GIF Support etc.
-  //
-
-  //---------------------------------------------------------------------
-  // byteArrayOutputStream
-  //---------------------------------------------------------------------
-
-  var byteArrayOutputStream = function() {
-
-    var _bytes = [];
-
-    var _this = {};
-
-    _this.writeByte = function(b) {
-      _bytes.push(b & 0xff);
-    };
-
-    _this.writeShort = function(i) {
-      _this.writeByte(i);
-      _this.writeByte(i >>> 8);
-    };
-
-    _this.writeBytes = function(b, off, len) {
-      off = off || 0;
-      len = len || b.length;
-      for (var i = 0; i < len; i += 1) {
-        _this.writeByte(b[i + off]);
-      }
-    };
-
-    _this.writeString = function(s) {
-      for (var i = 0; i < s.length; i += 1) {
-        _this.writeByte(s.charCodeAt(i) );
-      }
-    };
-
-    _this.toByteArray = function() {
-      return _bytes;
-    };
-
-    _this.toString = function() {
-      var s = '';
-      s += '[';
-      for (var i = 0; i < _bytes.length; i += 1) {
-        if (i > 0) {
-          s += ',';
-        }
-        s += _bytes[i];
-      }
-      s += ']';
-      return s;
-    };
-
-    return _this;
-  };
-
-  //---------------------------------------------------------------------
-  // base64EncodeOutputStream
-  //---------------------------------------------------------------------
-
-  var base64EncodeOutputStream = function() {
-
-    var _buffer = 0;
-    var _buflen = 0;
-    var _length = 0;
-    var _base64 = '';
-
-    var _this = {};
-
-    var writeEncoded = function(b) {
-      _base64 += String.fromCharCode(encode(b & 0x3f) );
-    };
-
-    var encode = function(n) {
-      if (n < 0) {
-        // error.
-      } else if (n < 26) {
-        return 0x41 + n;
-      } else if (n < 52) {
-        return 0x61 + (n - 26);
-      } else if (n < 62) {
-        return 0x30 + (n - 52);
-      } else if (n == 62) {
-        return 0x2b;
-      } else if (n == 63) {
-        return 0x2f;
-      }
-      throw 'n:' + n;
-    };
-
-    _this.writeByte = function(n) {
-
-      _buffer = (_buffer << 8) | (n & 0xff);
-      _buflen += 8;
-      _length += 1;
-
-      while (_buflen >= 6) {
-        writeEncoded(_buffer >>> (_buflen - 6) );
-        _buflen -= 6;
-      }
-    };
-
-    _this.flush = function() {
-
-      if (_buflen > 0) {
-        writeEncoded(_buffer << (6 - _buflen) );
-        _buffer = 0;
-        _buflen = 0;
-      }
-
-      if (_length % 3 != 0) {
-        // padding
-        var padlen = 3 - _length % 3;
-        for (var i = 0; i < padlen; i += 1) {
-          _base64 += '=';
-        }
-      }
-    };
-
-    _this.toString = function() {
-      return _base64;
-    };
-
-    return _this;
-  };
-
-  //---------------------------------------------------------------------
-  // base64DecodeInputStream
-  //---------------------------------------------------------------------
-
-  var base64DecodeInputStream = function(str) {
-
-    var _str = str;
-    var _pos = 0;
-    var _buffer = 0;
-    var _buflen = 0;
-
-    var _this = {};
-
-    _this.read = function() {
-
-      while (_buflen < 8) {
-
-        if (_pos >= _str.length) {
-          if (_buflen == 0) {
-            return -1;
-          }
-          throw 'unexpected end of file./' + _buflen;
-        }
-
-        var c = _str.charAt(_pos);
-        _pos += 1;
-
-        if (c == '=') {
-          _buflen = 0;
-          return -1;
-        } else if (c.match(/^\s$/) ) {
-          // ignore if whitespace.
-          continue;
-        }
-
-        _buffer = (_buffer << 6) | decode(c.charCodeAt(0) );
-        _buflen += 6;
-      }
-
-      var n = (_buffer >>> (_buflen - 8) ) & 0xff;
-      _buflen -= 8;
-      return n;
-    };
-
-    var decode = function(c) {
-      if (0x41 <= c && c <= 0x5a) {
-        return c - 0x41;
-      } else if (0x61 <= c && c <= 0x7a) {
-        return c - 0x61 + 26;
-      } else if (0x30 <= c && c <= 0x39) {
-        return c - 0x30 + 52;
-      } else if (c == 0x2b) {
-        return 62;
-      } else if (c == 0x2f) {
-        return 63;
-      } else {
-        throw 'c:' + c;
-      }
-    };
-
-    return _this;
-  };
-
-  //---------------------------------------------------------------------
-  // gifImage (B/W)
-  //---------------------------------------------------------------------
-
-  var gifImage = function(width, height) {
-
-    var _width = width;
-    var _height = height;
-    var _data = new Array(width * height);
-
-    var _this = {};
-
-    _this.setPixel = function(x, y, pixel) {
-      _data[y * _width + x] = pixel;
-    };
-
-    _this.write = function(out) {
-
-      //---------------------------------
-      // GIF Signature
-
-      out.writeString('GIF87a');
-
-      //---------------------------------
-      // Screen Descriptor
-
-      out.writeShort(_width);
-      out.writeShort(_height);
-
-      out.writeByte(0x80); // 2bit
-      out.writeByte(0);
-      out.writeByte(0);
-
-      //---------------------------------
-      // Global Color Map
-
-      // black
-      out.writeByte(0x00);
-      out.writeByte(0x00);
-      out.writeByte(0x00);
-
-      // white
-      out.writeByte(0xff);
-      out.writeByte(0xff);
-      out.writeByte(0xff);
-
-      //---------------------------------
-      // Image Descriptor
-
-      out.writeString(',');
-      out.writeShort(0);
-      out.writeShort(0);
-      out.writeShort(_width);
-      out.writeShort(_height);
-      out.writeByte(0);
-
-      //---------------------------------
-      // Local Color Map
-
-      //---------------------------------
-      // Raster Data
-
-      var lzwMinCodeSize = 2;
-      var raster = getLZWRaster(lzwMinCodeSize);
-
-      out.writeByte(lzwMinCodeSize);
-
-      var offset = 0;
-
-      while (raster.length - offset > 255) {
-        out.writeByte(255);
-        out.writeBytes(raster, offset, 255);
-        offset += 255;
-      }
-
-      out.writeByte(raster.length - offset);
-      out.writeBytes(raster, offset, raster.length - offset);
-      out.writeByte(0x00);
-
-      //---------------------------------
-      // GIF Terminator
-      out.writeString(';');
-    };
-
-    var bitOutputStream = function(out) {
-
-      var _out = out;
-      var _bitLength = 0;
-      var _bitBuffer = 0;
-
-      var _this = {};
-
-      _this.write = function(data, length) {
-
-        if ( (data >>> length) != 0) {
-          throw 'length over';
-        }
-
-        while (_bitLength + length >= 8) {
-          _out.writeByte(0xff & ( (data << _bitLength) | _bitBuffer) );
-          length -= (8 - _bitLength);
-          data >>>= (8 - _bitLength);
-          _bitBuffer = 0;
-          _bitLength = 0;
-        }
-
-        _bitBuffer = (data << _bitLength) | _bitBuffer;
-        _bitLength = _bitLength + length;
-      };
-
-      _this.flush = function() {
-        if (_bitLength > 0) {
-          _out.writeByte(_bitBuffer);
-        }
-      };
-
-      return _this;
-    };
-
-    var getLZWRaster = function(lzwMinCodeSize) {
-
-      var clearCode = 1 << lzwMinCodeSize;
-      var endCode = (1 << lzwMinCodeSize) + 1;
-      var bitLength = lzwMinCodeSize + 1;
-
-      // Setup LZWTable
-      var table = lzwTable();
-
-      for (var i = 0; i < clearCode; i += 1) {
-        table.add(String.fromCharCode(i) );
-      }
-      table.add(String.fromCharCode(clearCode) );
-      table.add(String.fromCharCode(endCode) );
-
-      var byteOut = byteArrayOutputStream();
-      var bitOut = bitOutputStream(byteOut);
-
-      // clear code
-      bitOut.write(clearCode, bitLength);
-
-      var dataIndex = 0;
-
-      var s = String.fromCharCode(_data[dataIndex]);
-      dataIndex += 1;
-
-      while (dataIndex < _data.length) {
-
-        var c = String.fromCharCode(_data[dataIndex]);
-        dataIndex += 1;
-
-        if (table.contains(s + c) ) {
-
-          s = s + c;
-
-        } else {
-
-          bitOut.write(table.indexOf(s), bitLength);
-
-          if (table.size() < 0xfff) {
-
-            if (table.size() == (1 << bitLength) ) {
-              bitLength += 1;
-            }
-
-            table.add(s + c);
-          }
-
-          s = c;
-        }
-      }
-
-      bitOut.write(table.indexOf(s), bitLength);
-
-      // end code
-      bitOut.write(endCode, bitLength);
-
-      bitOut.flush();
-
-      return byteOut.toByteArray();
-    };
-
-    var lzwTable = function() {
-
-      var _map = {};
-      var _size = 0;
-
-      var _this = {};
-
-      _this.add = function(key) {
-        if (_this.contains(key) ) {
-          throw 'dup key:' + key;
-        }
-        _map[key] = _size;
-        _size += 1;
-      };
-
-      _this.size = function() {
-        return _size;
-      };
-
-      _this.indexOf = function(key) {
-        return _map[key];
-      };
-
-      _this.contains = function(key) {
-        return typeof _map[key] != 'undefined';
-      };
-
-      return _this;
-    };
-
-    return _this;
-  };
-
-  var createDataURL = function(width, height, getPixel) {
-    var gif = gifImage(width, height);
-    for (var y = 0; y < height; y += 1) {
-      for (var x = 0; x < width; x += 1) {
-        gif.setPixel(x, y, getPixel(x, y) );
-      }
-    }
-
-    var b = byteArrayOutputStream();
-    gif.write(b);
-
-    var base64 = base64EncodeOutputStream();
-    var bytes = b.toByteArray();
-    for (var i = 0; i < bytes.length; i += 1) {
-      base64.writeByte(bytes[i]);
-    }
-    base64.flush();
-
-    return 'data:image/gif;base64,' + base64;
-  };
-
-  //---------------------------------------------------------------------
-  // returns qrcode function.
-
-  return qrcode;
-}();
-
-// multibyte support
-!function() {
-
-  qrcode.stringToBytesFuncs['UTF-8'] = function(s) {
-    // http://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
-    function toUTF8Array(str) {
-      var utf8 = [];
-      for (var i=0; i < str.length; i++) {
-        var charcode = str.charCodeAt(i);
-        if (charcode < 0x80) utf8.push(charcode);
-        else if (charcode < 0x800) {
-          utf8.push(0xc0 | (charcode >> 6),
-              0x80 | (charcode & 0x3f));
-        }
-        else if (charcode < 0xd800 || charcode >= 0xe000) {
-          utf8.push(0xe0 | (charcode >> 12),
-              0x80 | ((charcode>>6) & 0x3f),
-              0x80 | (charcode & 0x3f));
-        }
-        // surrogate pair
-        else {
-          i++;
-          // UTF-16 encodes 0x10000-0x10FFFF by
-          // subtracting 0x10000 and splitting the
-          // 20 bits of 0x0-0xFFFFF into two halves
-          charcode = 0x10000 + (((charcode & 0x3ff)<<10)
-            | (str.charCodeAt(i) & 0x3ff));
-          utf8.push(0xf0 | (charcode >>18),
-              0x80 | ((charcode>>12) & 0x3f),
-              0x80 | ((charcode>>6) & 0x3f),
-              0x80 | (charcode & 0x3f));
-        }
-      }
-      return utf8;
-    }
-    return toUTF8Array(s);
-  };
-
-}();
-
-(function (factory) {
-  if (typeof define === 'function' && define.amd) {
-      define([], factory);
-  } else if (typeof exports === 'object') {
-      module.exports = factory();
-  }
-}(function () {
-    return qrcode;
-}));
+<body>
+
+<!-- v0.6.2A SAFE MERGE: toolbar return / log scope / Korean permission labels / consistent scroll. Numbering workflow is preserved from v0.4.0N. -->
+<div id="v060LoginOverlay">
+  <div class="v060-login-box">
+    <h2>검사성적서 자동 생성</h2>
+    <div class="v060-login-sub">v0.7.0A · NUMBERING WORKSPACE SPLIT REVIEWED FIXED</div>
+    <div class="v060-field"><label>사용자 ID</label><input id="v060LoginId" autocomplete="username" placeholder="사용자 ID" onkeydown="if(event.key==='Enter')v060Login()"></div>
+    <div class="v060-field"><label>비밀번호</label><input id="v060LoginPw" type="password" autocomplete="current-password" placeholder="비밀번호" onkeydown="if(event.key==='Enter')v060Login()"></div>
+    <button class="v060-login-btn" onclick="v060Login()">로그인</button>
+    <div class="v060-err" id="v060LoginErr"></div>
+    <!-- v0.6.2A: 로그인창의 기본 계정 노출 제거 -->
+  </div>
+</div>
+
+<div id="v060AccountsPage" class="v060-page">
+  <div class="v060-page-head">
+    <div class="v060-page-title">👥 계정 / 권한 관리</div>
+    <button class="btn btn-primary v060-close" onclick="v060ReturnToMain()">← 검사성적서로 돌아가기</button>
+  </div>
+  <div class="v060-panel">
+    <div style="display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:8px;align-items:end">
+      <div class="v060-field" style="margin:0"><label>ID</label><input id="v060NewId" class="v060-mini" placeholder="user_id"></div>
+      <div class="v060-field" style="margin:0"><label>이름</label><input id="v060NewName" class="v060-mini" placeholder="사용자명"></div>
+      <div class="v060-field" style="margin:0"><label>임시 비밀번호</label><input id="v060NewPw" class="v060-mini" placeholder="password"></div>
+      <div class="v060-field" style="margin:0"><label>역할</label><select id="v060NewRole" class="v060-mini"><option value="USER">일반 사용자</option><option value="ADMIN">관리자</option></select></div>
+      <button class="btn btn-primary" onclick="v060AddAccount()">계정 추가</button>
+    </div>
+  </div>
+  <div class="v060-panel"><div style="overflow:auto;max-height:calc(100vh - 230px)"><table class="v060-table"><thead><tr><th>ID</th><th>이름</th><th>역할/상태</th><th>권한 Override</th><th>작업</th></tr></thead><tbody id="v060AccountsTbody"></tbody></table></div></div>
+</div>
+
+<div id="v060LogsPage" class="v060-page">
+  <div class="v060-page-head">
+    <div class="v060-page-title">📋 로그</div>
+    <button class="btn btn-secondary" onclick="v060ExportLogsCsv()">CSV 다운로드</button>
+    <button class="btn btn-secondary" id="v060ClearLogsBtn" onclick="v060ClearCurrentLogs()" style="color:#dc2626;border-color:#dc2626">현재 탭 삭제</button>
+    <button class="btn btn-primary v060-close" onclick="v060ReturnToMain()">← 검사성적서로 돌아가기</button>
+  </div>
+  <div class="v060-panel">
+    <div class="v060-log-filters">
+      <button class="v060-tab active" data-log-tab="login" onclick="v060SwitchLogTab('login',this)">로그인 기록</button>
+      <button class="v060-tab" data-log-tab="analysis" onclick="v060SwitchLogTab('analysis',this)">분석도구 사용기록</button>
+      <button class="v060-tab" data-log-tab="download" onclick="v060SwitchLogTab('download',this)">다운로드 기록</button>
+      <select id="v060LogUser" class="v060-mini" onchange="v060RenderLogs()"><option value="">전체 사용자</option></select>
+      <select id="v060LogStatus" class="v060-mini" onchange="v060RenderLogs()"><option value="">전체 결과</option><option value="attempt">시도</option><option value="success">성공</option><option value="fail">실패</option></select>
+      <input id="v060LogFrom" type="date" class="v060-mini" onchange="v060RenderLogs()" title="한국시간 시작일">
+      <input id="v060LogTo" type="date" class="v060-mini" onchange="v060RenderLogs()" title="한국시간 종료일">
+      <input id="v060LogSearch" class="v060-mini" style="min-width:200px" placeholder="검색" oninput="v060RenderLogs()">
+      <span id="v060LogCount" style="font-size:11px;color:var(--text-dim);align-self:center"></span>
+    </div>
+    <div style="overflow:auto;max-height:calc(100vh - 210px)"><table class="v060-table"><thead id="v060LogHead"></thead><tbody id="v060LogTbody"></tbody></table></div>
+  </div>
+</div>
+
+
+<!-- 모달 -->
+<div class="modal-bg" id="alertModal">
+  <div class="modal-box">
+    <div class="modal-title" id="alertTitle"></div>
+    <div class="modal-body" id="alertBody"></div>
+    <button class="btn btn-primary" onclick="document.getElementById('alertModal').classList.remove('open')">확인</button>
+  </div>
+</div>
+<div class="modal-bg" id="progModal">
+  <div class="modal-box prog-box">
+    <div class="modal-title" id="progTitle">처리 중...</div>
+    <div class="prog-track"><div class="prog-thumb" id="progThumb"></div></div>
+    <div class="prog-txt" id="progTxt"></div>
+  </div>
+</div>
+<div class="detail-slide" id="detailSlide">
+  <button class="detail-close" onclick="closeDetail()">✕</button>
+  <div id="detailBody"></div>
+</div>
+
+<!-- 헤더 -->
+<div class="app-header">
+  <span class="mode-tag user" id="modeTag">사용자</span>
+  <div class="app-logo">검사성적서 자동 생성</div>
+  <div class="app-ver">v0.7.0A NUMBERING_WORKSPACE_SPLIT_REVIEWED_FIXED</div>
+  <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+    <span id="libErr" style="display:none;font-size:10px;color:var(--c-miss)">⚠ SheetJS 미로드</span>
+    <button class="btn btn-secondary" id="v060AccountsBtn" onclick="v060ShowAccounts()">👥 계정관리</button>
+    <button class="btn btn-secondary" id="v060LogsBtn" onclick="v060ShowLogs()">📋 로그</button>
+    <button class="btn btn-secondary" id="v060SettingsBtn" onclick="v060ShowSettings()">⚙️ 환경설정</button>
+    <button class="btn btn-secondary" id="v060NumberingBtn" onclick="v060ShowNumbering()" style="display:none;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;border-color:#7c3aed">📐 넘버링 작업실</button>
+    <button class="btn btn-primary" id="v060MainReturnBtn" onclick="v060ReturnToMain()" style="display:none;padding:4px 10px!important;font-size:11px!important">← 검사성적서</button>
+    <div id="v060AuthBadge"><span id="v060UserName">-</span><span class="v060-role USER" id="v060UserRole">USER</span></div>
+    <button class="btn btn-secondary" id="v060LogoutBtn" onclick="v060Logout()">로그아웃</button>
+    <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="toggleDark()" id="darkBtn">🌙</button>
+    <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="toggleAdv()" id="advBtn" title="고급 모드">⚙</button>
+  </div>
+</div>
+
+<!-- 사용자 모드 -->
+<div id="userMode">
+  <!-- Stepper -->
+  <div class="stepper" id="stepper">
+    <div class="step active" id="stp1" onclick="goStep(1)">
+      <div class="step-dot">1</div><div class="step-label">파일 업로드</div>
+    </div>
+    <div class="step-line" id="sl1"></div>
+    <div class="step" id="stp2" onclick="goStep(2)">
+      <div class="step-dot">2</div><div class="step-label">분석 결과</div>
+    </div>
+    <div class="step-line" id="sl2"></div>
+    <div class="step" id="stp3" onclick="goStep(3)">
+      <div class="step-dot">3</div><div class="step-label">성적서 완성도</div>
+    </div>
+    <div class="step-line" id="sl3"></div>
+    <div class="step" id="stp4" onclick="goStep(4)">
+      <div class="step-dot">4</div><div class="step-label">항목 미리보기</div>
+    </div>
+    <div class="step-line" id="sl4"></div>
+    <div class="step" id="stp5" onclick="goStep(5)">
+      <div class="step-dot">5</div><div class="step-label">결과 다운로드</div>
+    </div>
+  </div>
+
+  <!-- 단계 1: 업로드 -->
+  <div class="step-body" id="step1">
+    <div class="card" id="prefCard" style="margin-bottom:14px">
+      <div class="card-title">기본 정보</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:560px">
+        <div>
+          <label for="companySelect" style="display:block;font-size:13px;margin-bottom:6px;font-weight:600">회사명</label>
+          <select id="companySelect" style="width:100%;padding:8px 10px;border:1px solid var(--c-border,#d0d5dd);border-radius:8px;background:var(--c-card,#fff);color:inherit;font-size:14px">
+            <option value="" disabled selected>회사 선택</option>
+            <option value="A">A 회사</option>
+            <option value="B">B 회사</option>
+          </select>
+        </div>
+        <div>
+          <label for="inspectCount" style="display:block;font-size:13px;margin-bottom:6px;font-weight:600">검사 횟수 (1~10)</label>
+          <input type="number" id="inspectCount" min="1" max="10" step="1" value="1" style="width:100%;padding:8px 10px;border:1px solid var(--c-border,#d0d5dd);border-radius:8px;background:var(--c-card,#fff);color:inherit;font-size:14px">
+        </div>
+      </div>
+      <div style="font-size:12px;color:#888;margin-top:8px">* 검사 횟수는 성적서의 측정 결과 열 수와 연동됩니다(추후 적용).</div>
+    </div>
+    <div class="card">
+      <div class="card-title">파일 업로드</div>
+      <div class="upload-grid">
+        <div class="upload-card" id="cardDxf">
+          <input type="file" accept=".dxf,.pdf" onchange="onDxfFile(this)">
+          <span class="upload-icon">📐</span>
+          <div class="upload-title">도면 파일 <span style="color:var(--c-miss)">*</span></div>
+          <div class="upload-hint">DXF 또는 PDF<br>DWG는 변환 후 업로드</div>
+          <div class="upload-info" id="dxfInfo"></div>
+        </div>
+        <div class="upload-card" id="cardXlsx">
+          <input type="file" accept=".xlsx,.xlsm" onchange="onXlsxFile(this)">
+          <span class="upload-icon">📋</span>
+          <div class="upload-title">빈 검사성적서 양식 <span style="color:var(--c-miss)">*</span></div>
+          <div class="upload-hint">XLSX 파일<br>출력 템플릿</div>
+          <div class="upload-info" id="xlsxInfo"></div>
+        </div>
+      </div>
+      <div class="db-notice">
+        <span class="db-tag">내장 DB</span>
+        <span style="font-size:11px;color:var(--text-dim)">기준정보 <strong id="refCnt">121</strong>건 포함</span>
+        <span class="db-tag" style="margin-left:4px">내장 DB</span>
+        <span style="font-size:11px;color:var(--text-dim)">도면구획 프로파일 포함</span>
+      </div>
+      <button class="btn btn-primary" id="analyzeBtn" onclick="runAnalysis()" disabled style="width:100%;padding:10px">🔄 분석 시작</button>
+      <button class="btn btn-secondary" onclick="diagXlsxUpload()" style="width:100%;margin-top:6px;font-size:11px;padding:5px">🔍 XLSX 업로드 상태 진단</button>
+    </div>
+  </div>
+
+  <!-- 단계 2: 분석 결과 -->
+  <div class="step-body hidden" id="step2">
+    <div class="card">
+      <div class="card-title">분석 진행률</div>
+      <div class="progress-stages" id="progStages">
+        <!-- JS에서 채움 -->
+      </div>
+      <div style="font-size:12px;color:var(--text-dim);text-align:right;margin-top:4px">
+        전체 진행률: <strong id="totalPct" style="color:var(--accent)">0%</strong>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">도면 분석 요약</div>
+      <div class="stat-grid" id="analysisStats"></div>
+    </div>
+  </div>
+
+  <!-- 단계 3: 성적서 완성도 -->
+  <div class="step-body hidden" id="step3">
+    <div class="card">
+      <div class="card-title">전체 112개 항목 완성도</div>
+      <div class="comp-bar-wrap" id="compBar"></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:10px;margin-bottom:12px">
+        <span style="color:var(--c-dxf)">■ DXF 원천</span>
+        <span style="color:var(--c-ref)">■ 기준DB 보완</span>
+        <span style="color:var(--c-gen)">■ 범위 생성값</span>
+        <span style="color:var(--c-fixed)">■ 고정 결과</span>
+        <span style="color:var(--c-rev)">■ 검토 필요</span>
+        <span style="color:var(--c-miss)">■ 생성 불가</span>
+      </div>
+      <div class="comp-cards" id="compCards"></div>
+    </div>
+  </div>
+
+  <!-- 단계 4: 항목 미리보기 -->
+  <div class="step-body hidden" id="step4">
+    <div class="card">
+      <div class="card-title">성적서 항목 / 결과 미리보기 (112개)</div>
+      <div class="search-row">
+        <input class="search-inp" type="text" id="itemSearch" placeholder="검번, 구획, 규격 검색..." oninput="filterItems()">
+        <span style="font-size:11px;color:var(--text-dim)" id="itemCnt"></span>
+      </div>
+      <div class="filter-chips" id="itemChips">
+        <button class="chip active" onclick="setItemFilter(this,'all')">전체</button>
+        <button class="chip" onclick="setItemFilter(this,'DXF_CONFIRMED')">DXF 원천</button>
+        <button class="chip" onclick="setItemFilter(this,'REFERENCE_SPEC_DATABASE')">기준DB 보완</button>
+        <button class="chip" onclick="setItemFilter(this,'RANGE_RANDOM_RESULT')">범위 생성</button>
+        <button class="chip" onclick="setItemFilter(this,'FIXED_TEXT_RESULT')">고정 결과</button>
+        <button class="chip" onclick="setItemFilter(this,'REVIEW_REQUIRED')">검토 필요</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th>검번</th><th>구획</th><th>규격</th><th>공차</th><th>검사방법</th>
+            <th>최종 결과값</th><th>데이터 구분</th><th>결과 유형</th><th>상태</th>
+          </tr></thead>
+          <tbody id="itemTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 단계 5: 다운로드 -->
+  <div class="step-body hidden" id="step5">
+    <div class="card" id="verifyCard">
+      <div class="card-title">다운로드 전 검증 요약</div>
+      <div class="verify-grid" id="verifyGrid">
+        <div class="verify-row"><span class="verify-label">분석 완료</span><span class="verify-val vwarn">분석 먼저 실행</span></div>
+      </div>
+    </div>
+    <div class="dl-grid">
+      <div class="dl-card">
+        <div style="font-size:32px;margin-bottom:8px">📥</div>
+        <h4>검사성적서 XLSX</h4>
+        <p>원본 양식 기반 최종 결과물<br>Form3 반영 + 7개 진단 시트</p>
+        <button class="btn btn-primary" id="dlXlsxBtn" onclick="downloadXLSX()" disabled style="width:100%">검사성적서 다운로드</button>
+      </div>
+      <div class="dl-card" style="border-left:3px solid #7c3aed;">
+        <div style="font-size:32px;margin-bottom:8px">📐</div>
+        <h4>넘버링 PDF</h4>
+        <p>도면 넘버링 작업은 전용 작업실에서<br>진행 후 PDF를 출력하세요.</p>
+        <div id="pdfQaSummary" style="font-size:11px;color:#6b7280;margin-bottom:6px;text-align:center">위치 확정 0/112</div>
+        <button class="btn btn-primary" id="dlPdfBtn" onclick="exportNumberingPDF()" disabled
+          style="width:100%;background:#7c3aed;border-color:#7c3aed;margin-bottom:6px">넘버링 PDF 다운로드</button>
+        <button class="btn btn-secondary" onclick="v060ShowNumbering()"
+          style="width:100%;font-size:11px">📐 넘버링 작업실 열기 →</button>
+      </div>
+      <div class="dl-card">
+        <div style="font-size:32px;margin-bottom:8px">📊</div>
+        <h4>분석 리포트</h4>
+        <p>112개 항목 Source Trace<br>specSourceType + resultType</p>
+        <button class="btn btn-secondary" id="dlReportBtn" onclick="downloadReport()" disabled style="width:100%">리포트 다운로드</button>
+      </div>
+      <div class="dl-card">
+        <div style="font-size:32px;margin-bottom:8px">📝</div>
+        <h4>Generation Log</h4>
+        <p>seed, min/max, 생성규칙<br>전체 기록</p>
+        <button class="btn btn-secondary" id="dlLogBtn" onclick="downloadLog()" disabled style="width:100%">Log 다운로드</button>
+      </div>
+    </div>
+    <!-- 넘버링 상태 요약 (메인화면) -->
+    <div class="nws-summary-card">
+      <div style="font-size:11px;font-weight:700;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">📐 넘버링 현황</div>
+      <div class="nws-summary-grid">
+        <div class="nws-summary-item"><div class="nws-summary-num" id="nwsMainTotal">0</div><div class="nws-summary-lbl">전체</div></div>
+        <div class="nws-summary-item"><div class="nws-summary-num" id="nwsMainAuto" style="color:var(--c-ok)">0</div><div class="nws-summary-lbl">자동배치</div></div>
+        <div class="nws-summary-item"><div class="nws-summary-num" id="nwsMainReview" style="color:var(--c-rev)">0</div><div class="nws-summary-lbl">검토필요</div></div>
+        <div class="nws-summary-item"><div class="nws-summary-num" id="nwsMainFailed" style="color:var(--c-miss)">0</div><div class="nws-summary-lbl">미배치</div></div>
+      </div>
+      <button class="btn btn-secondary" onclick="v060ShowNumbering()" style="width:100%;font-size:12px">
+        📐 넘버링 작업실에서 상세 작업 →
+      </button>
+    </div>
+  </div>
+
+    <!-- dxfPreviewSection → 넘버링 작업실 페이지로 이동 (v0.7.0) -->
+</div><!-- /userMode -->
+
+<!-- ═══ v0.7.0 넘버링 작업실 페이지 ═══ -->
+<div id="numberingPage" class="v060-page">
+  <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10">
+    <span style="font-size:14px;font-weight:800;color:#7c3aed">📐 넘버링 작업실</span>
+    <span class="app-ver" id="nwsVerLabel">v0.7.0A</span>
+    <!-- 넘버링 상태 배지 -->
+    <div style="display:flex;gap:4px;margin-left:8px" id="nwsHeaderStats">
+      <span class="nws-stat c-ok" style="padding:2px 6px;min-width:0;flex-direction:row;gap:4px"><span class="nws-stat-val" id="nwsHdrAuto" style="font-size:12px">0</span><span class="nws-stat-lbl">자동</span></span>
+      <span class="nws-stat c-rev" style="padding:2px 6px;min-width:0;flex-direction:row;gap:4px"><span class="nws-stat-val" id="nwsHdrReview" style="font-size:12px">0</span><span class="nws-stat-lbl">검토</span></span>
+      <span class="nws-stat c-miss" style="padding:2px 6px;min-width:0;flex-direction:row;gap:4px"><span class="nws-stat-val" id="nwsHdrFailed" style="font-size:12px">0</span><span class="nws-stat-lbl">미배치</span></span>
+      <span class="nws-stat c-fixed" style="padding:2px 6px;min-width:0;flex-direction:row;gap:4px"><span class="nws-stat-val" id="nwsHdrConfirmed" style="font-size:12px">0</span><span class="nws-stat-lbl">확정</span></span>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:6px">
+      <button class="btn btn-secondary" style="font-size:11px;padding:4px 10px" onclick="exportNumberingPDF()">⬇ 넘버링 PDF</button>
+      <button class="btn btn-secondary" style="font-size:11px;padding:4px 10px" onclick="exportPositionMapJSON()">💾 위치맵 저장</button>
+      <label style="font-size:11px;padding:4px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;display:inline-flex;align-items:center">📂 위치맵 불러오기<input type="file" accept=".json" style="display:none" onchange="importPositionMapJSON(event)"></label>
+      <button class="btn btn-primary" onclick="v060ReturnToMain()" style="font-size:11px;padding:4px 10px">← 검사성적서로</button>
+    </div>
+  </div>
+  <!-- 넘버링 작업실 본문: DXF Preview Section 이동 -->
+  <div style="padding:10px 12px;overflow:auto;height:calc(100vh - 96px)">
+    <div class="nws-diagnostics-card">
+      <div class="nws-diagnostics-head">
+        <div class="nws-diagnostics-title">112개 넘버링 진단표</div>
+        <span style="font-size:11px;color:var(--text-dim)">자동 배치 결과를 등급화해 문제 번호를 먼저 찾습니다.</span>
+        <button class="btn btn-secondary" type="button" onclick="nwsRenderDiagTable()" style="margin-left:auto;font-size:11px;padding:4px 10px">새로고침</button>
+      </div>
+      <div class="nws-diag-table-wrap">
+        <table class="nws-diag-table">
+          <thead><tr><th>번호</th><th>등급</th><th>상태</th><th>페이지</th><th>구획</th><th>규격</th><th>신뢰도</th><th>판단 사유</th></tr></thead>
+          <tbody id="nwsDiagTbody"><tr><td colspan="8" style="text-align:center;color:var(--text-dim);padding:14px">분석 후 자동 넘버링을 생성하면 진단표가 표시됩니다.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card dxf-preview-card">
+      <div class="dxf-preview-head">
+        <div>
+          <div class="card-title" style="margin-bottom:4px">DXF 도면 미리보기</div>
+          <div style="font-size:11px;color:var(--text-dim)" id="dxfPreviewStatus">DXF 파일을 업로드하면 이 영역에 도면 미리보기가 표시됩니다.</div>
+        </div>
+        <div class="dxf-preview-meta">
+          <span class="dxf-preview-pill" id="dxfPreviewFile">파일 없음</span>
+          <span class="dxf-preview-pill" id="dxfPreviewCount">엔티티 0</span>
+          <span class="dxf-preview-pill" id="dxfPreviewBounds">범위 -</span>
+        </div>
+      </div>
+      <div id="posItemDetail" style="display:none;margin:4px 0;padding:10px 12px;background:rgba(0,0,0,0.04);border-radius:6px;border:1px solid var(--border);font-size:11px;line-height:1.8;">
+        <div style="font-weight:700;margin-bottom:4px">📌 선택 항목 상세</div>
+        <div id="posItemDetailContent" style="font-family:monospace;word-break:break-all">—</div>
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+          <button onclick="anchorValidateSelected()" style="font-size:11px;padding:3px 8px;background:#059669;color:#fff;border:none;border-radius:4px;cursor:pointer" title="5개 조건 체크 + anchor 검증 확정">🎯 anchor 검증</button>
+          <button onclick="confirmSelectedItemPosition()" style="font-size:11px;padding:3px 8px;background:#059669;color:#fff;border:none;border-radius:4px;cursor:pointer;opacity:0.7">✅ 확정</button>
+          <button onclick="lockSelectedItemPosition()" style="font-size:11px;padding:3px 8px;background:#7c3aed;color:#fff;border:none;border-radius:4px;cursor:pointer">🔒 고정</button>
+          <button onclick="markSelectedItemReviewRequired()" style="font-size:11px;padding:3px 8px;background:#ef4444;color:#fff;border:none;border-radius:4px;cursor:pointer">⚠️ 검토필요</button>
+        </div>
+      </div>
+      <div class="dxf-preview-toolbar">
+        <button class="btn btn-secondary dxf-mode-btn active-view" id="dxfModeViewBtn" type="button" onclick="setDXFPreviewMode('view')">일반 모드</button>
+        <button class="btn btn-secondary dxf-mode-btn" id="dxfModeNumberBtn" type="button" onclick="setDXFPreviewMode('numbering')">넘버링 모드</button>
+        <button class="btn btn-secondary" type="button" onclick="fitDXFPreview()">화면 맞춤</button>
+        <button class="btn btn-secondary" type="button" onclick="zoomDXFPreview(1.25)">확대</button>
+        <button class="btn btn-secondary" type="button" onclick="zoomDXFPreview(0.8)">축소</button>
+        <button class="btn btn-secondary" type="button" onclick="resetDXFPreview()">초기화</button>
+        <button class="btn btn-secondary" type="button" onclick="toggleDXFPreviewCollapse()" id="dxfPreviewCollapseBtn">미리보기 접기</button>
+      </div>
+      <!-- v0.3.8: Sheet tabs (도면 1/2, 도면 2/2, 전체 보기) -->
+      <div class="dxf-sheet-tabs" id="dxfSheetTabs" style="display:none">
+        <span class="dxf-sheet-tabs-label">도면 시트:</span>
+        <div class="dxf-sheet-tabs-buttons" id="dxfSheetTabsButtons"></div>
+        <span class="dxf-sheet-detection-info" id="dxfSheetDetectionInfo"></span>
+      </div>
+      <div class="dxf-numbering-panel">
+        <div class="dxf-numbering-stat"><b>전체 항목</b><span id="dxfNumberingTotal">0개</span></div>
+        <div class="dxf-numbering-stat"><b>자동 배치</b><span id="dxfNumberingAuto">0개</span></div>
+        <div class="dxf-numbering-stat"><b>검토 필요</b><span id="dxfNumberingReview">0개</span></div>
+        <div class="dxf-numbering-stat"><b>미배치</b><span id="dxfNumberingFailed">0개</span></div>
+        <div class="dxf-numbering-stat"><b>수동 보정</b><span id="dxfNumberingManual">0개</span></div>
+        <div class="dxf-numbering-stat"><b>도면 표시</b><span id="dxfNumberingVisible">0개</span></div>
+        <div class="dxf-numbering-stat"><b>선택 번호</b><span id="dxfNumberingSelected">없음</span></div>
+        <div class="dxf-numbering-stat"><b>감지된 풍선</b><span id="dxfNumberingBalloons">0개</span></div>
+        <div id="workflowBanner" style="grid-column:1/-1;padding:6px 10px;background:linear-gradient(135deg,#1e40af,#7c3aed);color:#fff;border-radius:5px;font-size:11px;text-align:center;">
+          <b>📋 FINAL 위치맵 워크플로우</b><br>
+          <span style="font-size:10px;opacity:0.85">① 자동 초안 생성 → ② 번호 위치 보정 → ③ 위치맵 저장 → ④ 위치맵 불러오기 → ⑤ PDF 출력</span>
+          <div id="workflowStatus" style="margin-top:4px;font-size:10px;"></div>
+        </div>
+        <div class="dxf-numbering-stat" style="grid-column:1/-1;border-top:1px solid var(--border);padding-top:8px">
+          <b>위치 검수</b> <span id="posQaStat" style="font-size:11px">0/112 확정</span>
+        </div>
+        <div class="dxf-numbering-stat" style="grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap">
+          <button onclick="confirmAndNext()" style="font-size:11px;padding:4px 8px;background:#059669;color:#fff;border:none;border-radius:4px;cursor:pointer" title="확정 후 다음 미확정 항목으로 이동">✅ 확정→다음</button>
+          <button onclick="confirmSelectedItemPosition()" style="font-size:11px;padding:4px 8px;background:#059669;color:#fff;border:none;border-radius:4px;cursor:pointer;opacity:0.7">✅ 확정</button>
+          <button onclick="markSelectedItemReviewRequired()" style="font-size:11px;padding:4px 8px;background:#d97706;color:#fff;border:none;border-radius:4px;cursor:pointer">⚠️ 검토필요</button>
+          <button onclick="lockSelectedItemPosition()" style="font-size:11px;padding:4px 8px;background:#7c3aed;color:#fff;border:none;border-radius:4px;cursor:pointer">🔒 위치고정</button>
+          <button onclick="goToNextUnverified()" style="font-size:11px;padding:4px 8px;background:#6b7280;color:#fff;border:none;border-radius:4px;cursor:pointer" title="다음 미확정 항목으로 이동">⏭ 다음 미확정</button>
+          <button onclick="confirmAllVisiblePositions()" title="모든 위치를 직접 확인한 경우에만 사용" id="bulkConfirmBtn" style="font-size:11px;padding:4px 8px;background:#2563eb;color:#fff;border:none;border-radius:4px;cursor:pointer;display:none">⚠️ 일괄 확정</button>
+          <select id="posQaFilter" onchange="setPosQaFilter(this.value)" style="font-size:11px;padding:3px;border-radius:4px;border:1px solid var(--border)">
+            <option value="all">전체 보기</option>
+            <option value="unverified">미확정만</option>
+            <option value="review-required">검토필요만</option>
+            <option value="confirmed">확정/수정됨</option>
+            <option value="locked">고정만</option>
+          </select>
+        </div>
+        <div class="dxf-numbering-stat"><b>PDF 시각 기준</b><span id="dxfNumberingPdfSheets">0개</span></div>
+        <div class="dxf-numbering-stat"><b>PDF 후보 매칭</b><span id="dxfNumberingPdfMatched">0개</span></div>
+        <div class="dxf-numbering-stat" style="grid-column:1/-1;">
+          <label for="pdfRefFileInput" style="display:inline-block;padding:4px 8px;background:#d97706;color:#fff;border-radius:4px;cursor:pointer;font-size:11px;">📄 PDF 시각 기준 추가</label>
+          <input id="pdfRefFileInput" type="file" accept=".pdf" multiple style="display:none;" onchange="onPDFReferenceFilesPicked(event)"/>
+          <button onclick="clearAllPDFReferenceSheets()" style="margin-left:6px;font-size:11px;padding:4px 8px;background:#6b7280;color:#fff;border:none;border-radius:4px;cursor:pointer;">초기화</button>
+          <button onclick="exportNumberingPDF()" style="margin-left:6px;font-size:11px;padding:4px 10px;background:#7c3aed;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:600;">⬇ 넘버링 PDF 저장</button>
+          <button onclick="exportPositionMapJSON()" style="margin-left:6px;font-size:11px;padding:4px 8px;background:#0891b2;color:#fff;border:none;border-radius:4px;cursor:pointer" title="현재 112개 위치 좌표를 JSON으로 저장">💾 위치맵 저장</button>
+          <label for="posMapImportInput" style="margin-left:6px;display:inline-block;padding:4px 8px;background:#0891b2;color:#fff;border-radius:4px;cursor:pointer;font-size:11px" title="저장된 위치맵 JSON 불러오기">📂 위치맵 불러오기</label>
+          <input id="posMapImportInput" type="file" accept=".json" style="display:none" onchange="importPositionMapJSON(event)"/>
+        
+        </div>
+      </div>
+      <div class="dxf-preview-toolbar">
+        <button class="btn btn-secondary" type="button" onclick="generateAutoNumberingFromItems(true)">자동 넘버링 생성</button>
+        <button class="btn btn-secondary" type="button" onclick="regenerateAutoNumbering()">자동 넘버링 재생성</button>
+        <button class="btn btn-secondary" type="button" onclick="beginSelectedDXFNumberReposition()">선택 항목 위치 재지정</button>
+        <button class="btn btn-secondary" type="button" onclick="beginSelectedDXFNumberPlacement()">미배치 항목 위치 지정</button>
+        <button class="btn btn-secondary" type="button" onclick="deleteSelectedDXFNumber()">선택 번호 삭제</button>
+        <button class="btn btn-secondary" type="button" onclick="clearDXFNumbers()">전체 넘버링 초기화</button>
+        <button class="btn btn-secondary" type="button" onclick="toggleDXFNumberList()" id="dxfNumberListBtn">번호 목록 보기</button>
+        <span style="font-size:11px;color:var(--text-dim)" id="dxfNumberingHelp">자동 넘버링: 성적서 항목 기준으로 도면 위치를 자동 배치합니다.</span>
+      </div>
+      <div id="dxfPdfCanvasWrap">
+        <canvas id="dxfPdfCanvas"></canvas>
+        <div id="dxfPdfOverlay"></div>
+        <div class="pdf-canvas-hint">📄 PDF 시각 기준 — 수동 위치 지정 모드. 빈 공간을 클릭해 선택된 항목을 배치하세요.</div>
+          <div id="dxfPdfExportBar" style="position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:10;">
+            <button onclick="exportPDFPageWithMarkers('png')" style="font-size:11px;padding:4px 10px;background:#d97706;color:#fff;border:none;border-radius:4px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.2);">⬇ PNG 저장</button>
+            <button onclick="exportAllPDFPagesWithMarkers()" style="font-size:11px;padding:4px 10px;background:#7c3aed;color:#fff;border:none;border-radius:4px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.2);">⬇ 전 페이지 PNG</button>
+          </div>
+      </div>
+      <div class="dxf-preview-stage" id="dxfPreviewCanvasWrap">
+        <div class="dxf-preview-empty" id="dxfPreviewEmpty">DXF 파일을 업로드하면 이 영역에 도면 미리보기가 표시됩니다.</div>
+      </div>
+      <div class="dxf-numbering-list" id="dxfNumberingList">
+        <div class="dxf-numbering-filter" id="dxfNumberingFilters">
+          <button class="chip active" onclick="setDXFNumberFilter(this,'all')">전체</button>
+          <button class="chip" onclick="setDXFNumberFilter(this,'AUTO_PLACED')">자동 배치</button>
+          <button class="chip" onclick="setDXFNumberFilter(this,'review')">검토 필요</button>
+          <button class="chip" onclick="setDXFNumberFilter(this,'AUTO_PLACE_FAILED')">미배치</button>
+          <button class="chip" onclick="setDXFNumberFilter(this,'manual')">수동 보정</button>
+          <button class="chip" onclick="setDXFNumberFilter(this,'USER_DELETED')">삭제됨</button>
+          <button class="chip" onclick="setDXFNumberFilter(this,'low_confidence')">낮은 신뢰도</button>
+          <button class="chip" onclick="setDXFNumberFilter(this,'overlap')">중복/겹침</button>
+        </div>
+        <table>
+          <thead><tr><th>번호</th><th>성적서 항목</th><th>규격</th><th>sourceRawText</th><th>sourceObjectId</th><th>도면구획</th><th>X</th><th>Y</th><th>상태</th><th>신뢰도</th><th>매칭방식</th><th>오류/메모</th><th>작업</th></tr></thead>
+          <tbody id="dxfNumberingTbody"></tbody>
+        </table>
+      </div>
+      <div class="dxf-preview-foot">
+        <span>SVG 기반 미리보기</span>
+        <span id="dxfPreviewHint">LINE / LWPOLYLINE / POLYLINE / CIRCLE / ARC / TEXT / MTEXT / DIMENSION 표시</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 고급 모드 -->
+<div id="advMode">
+  <div class="adv-layout">
+    <!-- 왼쪽 -->
+    <div class="adv-panel">
+      <div class="adv-hdr">📐 원본 도면 Source Data</div>
+      <div class="adv-tabs">
+        <button class="adv-tab active" onclick="showAL(this,'raw')">Raw Objects</button>
+        <button class="adv-tab" onclick="showAL(this,'text')">Text/MTEXT</button>
+        <button class="adv-tab" onclick="showAL(this,'dim')">Dim Candidates</button>
+        <button class="adv-tab" onclick="showAL(this,'inum')">Item Candidates</button>
+        <button class="adv-tab" onclick="showAL(this,'noise')">Geometry/Noise</button>
+        <button class="adv-tab" onclick="showAL(this,'srccomp')">Source Compare</button>
+        <button class="adv-tab" onclick="showAL(this,'refdb')">Embedded Ref DB</button>
+        <button class="adv-tab" onclick="showAL(this,'zone')">Embedded Zone</button>
+        <button class="adv-tab" onclick="showAL(this,'tmpl')">XLSX Template Debug</button>
+      </div>
+      <div class="adv-body" id="AL_raw"><div class="table-wrap" style="max-height:calc(100vh - 185px)"><table class="data-table"><thead><tr><th>ID</th><th>type</th><th>layer</th><th>cleanedText</th><th>x</th><th>y</th><th>role</th><th>conf</th><th>N</th></tr></thead><tbody id="AL_rawTb"></tbody></table></div></div>
+      <div class="adv-body hidden" id="AL_text"><div class="table-wrap" style="max-height:calc(100vh - 185px)"><table class="data-table"><thead><tr><th>ID</th><th>type</th><th>layer</th><th>cleanedText</th><th>x</th><th>y</th><th>conf</th></tr></thead><tbody id="AL_textTb"></tbody></table></div></div>
+      <div class="adv-body hidden" id="AL_dim"><div class="table-wrap" style="max-height:calc(100vh - 185px)"><table class="data-table"><thead><tr><th>ID</th><th>layer</th><th>cleanedText</th><th>normalized</th><th>x</th><th>y</th><th>role</th><th>conf</th></tr></thead><tbody id="AL_dimTb"></tbody></table></div></div>
+      <div class="adv-body hidden" id="AL_inum"><div class="table-wrap" style="max-height:calc(100vh - 185px)"><table class="data-table"><thead><tr><th>ID</th><th>layer</th><th>text</th><th>x</th><th>y</th><th>conf</th></tr></thead><tbody id="AL_inumTb"></tbody></table></div></div>
+      <div class="adv-body hidden" id="AL_noise"><div style="font-size:11px;color:var(--text-dim);padding:6px 0 8px">⚠ 노이즈/제외 객체 — 치수 원천으로 사용 불가 판정</div><div class="table-wrap" style="max-height:calc(100vh - 210px)"><table class="data-table"><thead><tr><th>ID</th><th>type</th><th>layer</th><th>rawText</th><th>x</th><th>y</th><th>rejectReason</th></tr></thead><tbody id="AL_noiseTb"></tbody></table></div></div>
+      <div class="adv-body hidden" id="AL_srccomp">
+        <div class="stat-grid" id="SC_summary" style="margin-bottom:10px"></div>
+        <div class="table-wrap" style="max-height:calc(100vh - 280px)"><table class="data-table"><thead><tr><th>검번</th><th>구획</th><th>referenceSpec</th><th>dxfFound</th><th>sourceObjectId</th><th>sourceRawText</th><th>matchMethod</th><th>conf</th><th>specSourceType</th><th>resultType</th><th>generatedResult</th></tr></thead><tbody id="AL_scTb"></tbody></table></div>
+      </div>
+      <div class="adv-body hidden" id="AL_refdb"><div style="font-size:11px;color:var(--text-dim);margin-bottom:8px">REFERENCE_SPEC_DATABASE_EMBEDDED — <span id="refDbCnt"></span>건</div><div class="table-wrap" style="max-height:calc(100vh - 200px)"><table class="data-table"><thead><tr><th>#</th><th>drawingZone</th><th>spec</th><th>tolerance</th><th>method</th><th>source</th></tr></thead><tbody id="AL_refTb"></tbody></table></div></div>
+      <div class="adv-body hidden" id="AL_zone"><div id="zoneProfileJson" style="font-family:monospace;font-size:11px;padding:8px;background:var(--bg);border-radius:4px;margin-bottom:8px"></div><div class="table-wrap" style="max-height:calc(100vh - 230px)"><table class="data-table"><thead><tr><th>id</th><th>value</th><th>x</th><th>y</th><th>zone</th></tr></thead><tbody id="AL_zoneTb"></tbody></table></div></div>
+      <div class="adv-body hidden" id="AL_tmpl"><div style="font-size:11px;color:var(--text-dim);margin-bottom:8px">양식 의존성 스캔 — <span id="depCnt">미실행</span>건 (분석 후 활성화)</div><div class="table-wrap" style="max-height:calc(100vh - 200px)"><table class="data-table"><thead><tr><th>셀</th><th>값</th><th>참조처</th><th>내부화가능</th><th>삭제위험도</th><th>권장조치</th></tr></thead><tbody id="AL_tmplTb"></tbody></table></div></div>
+    </div>
+    <!-- 오른쪽 -->
+    <div class="adv-panel">
+      <div class="adv-hdr">📋 Item Trace 112</div>
+      <div style="padding:8px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap">
+        <input class="search-inp" type="text" id="traceSearch" placeholder="검번/구획/규격" oninput="filterTrace()" style="max-width:160px;margin-bottom:0">
+        <select class="mini" id="traceSrcSel" onchange="filterTrace()">
+          <option value="all">모든 출처</option>
+          <option value="DXF_CONFIRMED">DXF_CONFIRMED</option>
+          <option value="REFERENCE_SPEC_DATABASE">REF_SPEC_DB</option>
+        </select>
+        <select class="mini" id="traceRtSel" onchange="filterTrace()">
+          <option value="all">모든 유형</option>
+          <option value="RANGE_RANDOM_RESULT">RANGE</option>
+          <option value="MULTI_RANGE_RANDOM_RESULT">MULTI_RANGE</option>
+          <option value="FIXED_TEXT_RESULT">FIXED</option>
+          <option value="ACCEPT_RESULT">ACCEPT</option>
+          <option value="REFERENCE_RESULT">REF_RESULT</option>
+          <option value="REVIEW_REQUIRED">REVIEW</option>
+        </select>
+      </div>
+      <div style="overflow:auto;flex:1">
+        <table class="data-table">
+          <thead><tr>
+            <th>검번</th><th>구획</th><th>finalSpec</th>
+            <th>specSourceType</th><th>sourceObjectId</th><th>sourceRawText</th>
+            <th>matchMethod</th><th>conf</th>
+            <th>resultType</th><th>generatedResult</th><th>resultSourceType</th>
+            <th>outputCell</th><th>상태</th>
+          </tr></thead>
+          <tbody id="traceTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div><!-- /advMode -->
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- v0.7.0 split scripts: keep this order -->
+<script src="./vendor/xlsx-style.min.js"></script>
+<script src="./vendor/pdf.worker.source.js"></script>
+<script src="./vendor/pdf.lib.source.js"></script>
+<script src="./vendor/pdf.setup.js"></script>
+<script src="./vendor/exceljs.min.js"></script>
+<script src="./js/90_pdf_embedded_assets.js"></script>
+<script src="./js/app_core.js"></script>
+<script src="./js/80_direct_fix.js"></script>
+<script src="./js/85_numbering_workspace_helper.js"></script>
+<script src="./js/91_reference_position_map_80871631.js"></script>
+<script src="./js/99_auth_logs.js"></script>
+<script>
+/* v0.7.2: company / inspection-count accessors */
+window.getSelectedCompany=function(){var e=document.getElementById('companySelect');return e?e.value:'';};
+window.getInspectCount=function(){var e=document.getElementById('inspectCount');var n=e?parseInt(e.value,10):1;if(isNaN(n)||n<1)n=1;if(n>10)n=10;return n;};
 </script>
 
-<!-- ============ 관리자 화면 ============ -->
-<div class="app" id="adminApp" style="display:none">
-  <aside class="sidebar">
-    <div class="brand"><div class="logo" id="sideLogo">꽃</div><div><div class="b-name" id="sideStore">이태리식당 꽃반지</div><div class="b-sub">QR 금액권 · 중앙 원장</div></div></div>
-    <div class="nav-label">운영</div>
-    <button class="nav-item on" data-p="home" onclick="nav('home')"><span class="ic">▦</span>홈</button>
-    <button class="nav-item" data-p="create" onclick="nav('create')"><span class="ic">＋</span>쿠폰 생성</button>
-    <button class="nav-item" data-p="ledger" onclick="nav('ledger')"><span class="ic">▤</span>쿠폰 원장</button>
-    <button class="nav-item" data-p="redeem" onclick="nav('redeem')"><span class="ic">◳</span>QR 사용처리</button>
-    <button class="nav-item" data-p="records" onclick="nav('records')"><span class="ic">≡</span>사용 기록</button>
-    <div class="nav-label">관리</div>
-    <button class="nav-item" data-p="logs" onclick="nav('logs')"><span class="ic">⊞</span>로그</button>
-    <button class="nav-item" data-p="settings" onclick="nav('settings')"><span class="ic">⚙</span>설정</button>
-  </aside>
-  <div class="main">
-    <div class="topbar">
-      <button class="icon-btn menu-btn" onclick="toggleSide()">☰</button>
-      <div class="store"><span class="dot"></span><span id="topStore">이태리식당 꽃반지</span></div>
-      <div class="spacer"></div>
-      <span class="badge-st b-valid" id="sheetState">Sheet 연결됨</span>
-      <button class="icon-btn" id="themeBtn" onclick="cycleTheme()">☀</button>
+<!-- ===== 환경설정 페이지 (6탭) ===== -->
+<div id="v060SettingsPage" class="v060-page">
+  <div class="v060-page-head">
+    <div class="v060-page-title">⚙️ 환경설정</div>
+    <button class="btn btn-primary v060-close" onclick="v060ReturnToMain()">← 검사성적서로 돌아가기</button>
+  </div>
+  <div class="set-wrap">
+    <div class="set-nav" id="setNav">
+      <button class="set-tab on" data-t="server" onclick="v060SetTab('server')">🔌 서버 연결</button>
+      <button class="set-tab" data-t="deploy" onclick="v060SetTab('deploy')">🚀 웹 배포</button>
+      <button class="set-tab" data-t="defaults" onclick="v060SetTab('defaults')">🏢 회사/검사 기본값</button>
+      <button class="set-tab" data-t="logs" onclick="v060SetTab('logs')">📋 로그 관리</button>
+      <button class="set-tab" data-t="map" onclick="v060SetTab('map')">🗺 시스템 맵</button>
+      <button class="set-tab" data-t="ver" onclick="v060SetTab('ver')">🧾 버전 이력</button>
     </div>
-    <div class="wrap">
-      <!-- 홈 -->
-      <section class="page on" id="pg-home">
-        <div class="page-head"><h1>홈</h1><p id="homeSub">이태리식당 꽃반지 · Google Sheet 중앙 원장</p></div>
-        <div class="note brand" style="margin:16px 0"><span class="em">메인 원장은 Google Sheet입니다.</span> 쿠폰 사용 가능 여부는 항상 Sheet의 최신 상태로 판단합니다.</div>
-        <div class="section-title">오늘 운영 현황<span class="ln"></span></div>
-        <div class="stats" id="homeStats"></div>
+    <div class="set-body">
+      <section class="set-pane on" id="pane-server">
+        <h3>서버 연결</h3>
+        <p class="set-mut">로컬 로그/배포 서버 주소입니다. 연결 상태를 확인하세요.</p>
+        <div class="set-row"><label>서버 주소</label><input id="setSrvUrl" value="http://127.0.0.1:9200"></div>
+        <button class="btn btn-primary" onclick="v060PingServer()">연결 테스트</button>
+        <span id="setSrvStat" class="set-led">확인 안 함</span>
       </section>
-      <!-- 쿠폰 생성 -->
-      <section class="page" id="pg-create">
-        <div class="page-head"><h1>쿠폰 생성</h1><p>쿠폰을 만들면 Google Sheet 원장에 즉시 기록됩니다</p></div>
-        <div class="grid2" style="margin-top:16px;align-items:start">
-          <div class="card" style="padding:18px">
-            <div class="field"><label>쿠폰명</label><input class="inp" id="f_name" value="감사 식사권" oninput="syncCard()"></div>
-            <div class="grid2"><div class="field"><label>금액</label><select class="inp" id="f_amount" onchange="syncCard()"><option value="50000">50,000원</option><option value="100000">100,000원</option><option value="30000">30,000원</option></select></div>
-            <div class="field"><label>발행 수량</label><input class="inp" id="f_qty" type="number" value="1" min="1"></div></div>
-            <div class="grid2"><div class="field"><label>쿠폰 유형</label><select class="inp" id="f_type" onchange="syncCard()"><option>무상 증정권</option><option>이벤트 쿠폰</option><option>보상 쿠폰</option><option>유상 판매 쿠폰</option></select></div>
-            <div class="field"><label>유효기간</label><input class="inp" id="f_valid" type="date"></div></div>
-            <div class="field"><label>관리자 메모</label><input class="inp" id="f_memo" placeholder="선택"></div>
-            <button class="btn btn-primary btn-block" id="createBtn" onclick="doCreate()">쿠폰 생성</button>
-          </div>
-          <div class="card" style="padding:18px">
-            <div style="font-size:12px;font-weight:800;color:var(--muted);margin-bottom:12px">쿠폰 카드 미리보기</div>
-            <div class="coupon-img" id="cardPrev"></div>
-            <div class="tpl-pick"><button class="tp on" onclick="pickTpl(this,'basic')">기본형</button><button class="tp" onclick="pickTpl(this,'premium')">프리미엄</button><button class="tp" onclick="pickTpl(this,'event')">이벤트</button></div>
-            <div class="note info" style="margin-top:12px;font-size:11.5px">QR에는 <span class="em">쿠폰번호와 인증값</span>만 담깁니다. 금액·상태는 Google Sheet가 판단합니다.</div>
-          </div>
-        </div>
+      <section class="set-pane" id="pane-deploy">
+        <h3>웹 배포</h3>
+        <p class="set-mut">현재 소스를 GitHub(웹, www.easypps.com)에 업로드합니다. 로컬 서버가 git push를 실행합니다.</p>
+        <div class="set-row"><label>커밋 메시지</label><input id="setDeployMsg" value="Update from settings"></div>
+        <button class="btn btn-primary" onclick="v060Deploy()">🚀 웹페이지 업로드</button>
+        <pre id="setDeployLog" class="set-log"></pre>
       </section>
-      <!-- 쿠폰 원장 -->
-      <section class="page" id="pg-ledger">
-        <div class="page-head"><h1>쿠폰 원장</h1><p>Google Sheet coupons 시트 기준</p></div>
-        <div class="subtabs" id="ledgerChips" style="border:none;margin:14px 0 6px">
-          <button class="subtab on" onclick="setLF(this,'all')">전체</button><button class="subtab" onclick="setLF(this,'unused')">미사용</button>
-          <button class="subtab" onclick="setLF(this,'used')">사용완료</button><button class="subtab" onclick="setLF(this,'expired')">만료</button>
-          <button class="subtab" onclick="setLF(this,'void')">무효</button>
-        </div>
-        <div class="tbl-wrap"><table><thead><tr><th>쿠폰번호</th><th>쿠폰명</th><th>금액</th><th>상태</th><th>유효기간</th><th>발행일</th><th>관리</th></tr></thead><tbody id="ledgerBody"></tbody></table></div>
+      <section class="set-pane" id="pane-defaults">
+        <h3>회사 / 검사 기본값</h3>
+        <div class="set-row"><label>회사 목록(줄바꿈)</label><textarea id="setCompanies" rows="4">A 회사&#10;B 회사</textarea></div>
+        <div class="set-row"><label>기본 검사횟수</label><input type="number" id="setDefCount" min="1" max="10" value="1"></div>
+        <button class="btn btn-primary" onclick="v060SaveDefaults()">저장</button>
+        <span id="setDefStat" class="set-mut"></span>
       </section>
-      <!-- QR 사용처리(관리자 조회) -->
-      <section class="page" id="pg-redeem">
-        <div class="page-head"><h1>QR 사용처리</h1><p>고객 QR을 스캔하면 사용처리 화면이 열립니다. 여기서는 수동 조회를 할 수 있습니다.</p></div>
-        <div class="card" style="padding:18px;margin-top:16px;max-width:520px">
-          <div class="note info" style="font-size:12.5px;margin-bottom:14px">실제 사용처리는 <span class="em">고객 QR을 카메라로 스캔</span>해 열리는 사용처리 링크에서 진행합니다. 카메라가 어려우면 아래에 쿠폰번호를 입력해 상태를 조회하세요.</div>
-          <div class="field"><label>쿠폰번호 조회</label><div style="display:flex;gap:8px"><input class="inp" id="lookupNo" placeholder="CPN-…"><button class="btn btn-primary" onclick="doLookup()">조회</button></div></div>
-          <div id="lookupResult"></div>
-        </div>
+      <section class="set-pane" id="pane-logs">
+        <h3>로그 관리</h3>
+        <p class="set-mut">로컬 서버의 로그 대시보드로 이동하거나 CSV로 내려받습니다.</p>
+        <button class="btn btn-secondary" onclick="window.open((document.getElementById('setSrvUrl').value)+'/logs','_blank')">로그 대시보드 열기</button>
       </section>
-      <!-- 사용 기록 -->
-      <section class="page" id="pg-records">
-        <div class="page-head"><h1>사용 기록</h1><p>Google Sheet usage_logs 시트 기준</p></div>
-        <div class="tbl-wrap" style="margin-top:16px"><table><thead><tr><th>사용일시</th><th>쿠폰번호</th><th>쿠폰명</th><th>식사금액</th><th>적용</th><th>추가</th><th>소멸</th><th>상태</th></tr></thead><tbody id="recordsBody"></tbody></table></div>
-      </section>
-      <!-- 로그 -->
-      <section class="page" id="pg-logs">
-        <div class="page-head"><h1>로그</h1><p>Google Sheet 로그 시트 기준</p></div>
-        <div class="subtabs" id="logTabs" style="margin-top:14px">
-          <button class="subtab on" onclick="setLog(this,'scan_logs')">스캔 로그</button>
-          <button class="subtab" onclick="setLog(this,'admin_logs')">관리자 작업</button>
-          <button class="subtab" onclick="setLog(this,'usage_logs')">사용처리</button>
-          <button class="subtab" onclick="setLog(this,'export_logs')">내보내기</button>
-        </div>
-        <div class="tbl-wrap"><table><thead id="logHead"></thead><tbody id="logBody"></tbody></table></div>
-        <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="doExportCsv()">현재 로그 CSV 내보내기</button>
-      </section>
-      <!-- 설정 -->
-      <section class="page" id="pg-settings">
-        <div class="page-head"><h1>설정</h1><p>매장정보 · 비밀번호 · 화면 검수 · 사용설명서</p></div>
-        <div class="subtabs" id="setTabs" style="margin-top:14px">
-          <button class="subtab on" onclick="setST(this,'store')">매장정보</button>
-          <button class="subtab" onclick="setST(this,'pw')">관리자 비밀번호</button>
-          <button class="subtab" onclick="setST(this,'inspect')">화면 검수</button>
-          <button class="subtab" onclick="setST(this,'guide')">사용설명서</button>
-        </div>
-        <div class="page on" id="st-store">
-          <div class="card" style="padding:18px;max-width:580px">
-            <div class="field"><label>상호</label><input class="inp" id="s_name"></div>
-            <div class="grid2"><div class="field"><label>대표전화</label><input class="inp" id="s_tel"></div><div class="field"><label>기본 금액</label><input class="inp" id="s_amount" type="number"></div></div>
-            <div class="field"><label>도로명주소</label><input class="inp" id="s_addr1"></div>
-            <div class="field"><label>지번주소</label><input class="inp" id="s_addr2"></div>
-            <div class="field"><label>쿠폰 하단 문구</label><input class="inp" id="s_footer"></div>
-            <div class="field"><label>테마</label><div class="seg"><button class="opt on" onclick="pickTheme(this,'light')">라이트</button><button class="opt" onclick="pickTheme(this,'dark')">다크</button><button class="opt" onclick="pickTheme(this,'system')">시스템</button></div></div>
-            <button class="btn btn-primary btn-block" onclick="doSaveSettings()">설정 저장</button>
+      <section class="set-pane" id="pane-map">
+        <h3>시스템 맵 <button class="btn btn-secondary" style="float:right;font-size:11px;padding:4px 10px" onclick="ng_reset()">위치 초기화</button></h3>
+        <p class="set-mut">시스템 → 메뉴 → 구성요소. 드래그로 배치(저장), 클릭으로 우측 화면 미리보기.</p>
+        <div class="ng-wrap">
+          <div class="ng-stage" id="ngStage"><svg id="ngSvg"></svg></div>
+          <div class="ng-side">
+            <h4 id="ngPvTitle" style="margin:0 0 8px;color:#38e1b0;font-size:13px">화면 미리보기</h4>
+            <div id="ngPreview"><div class="ng-empty">메뉴 노드를 클릭하면 목업이 나타납니다.</div></div>
+            <div class="ng-desc" id="ngPvDesc"></div>
+            <div class="ng-clist" id="ngPvComp"></div>
           </div>
         </div>
-        <div class="page" id="st-pw">
-          <div class="card" style="padding:18px;max-width:480px">
-            <div class="note warn" style="font-size:12.5px;margin-bottom:14px">관리자 비밀번호는 서버에서 <span class="em">암호화(해시)</span>되어 저장됩니다. 사용처리·무효화 등에 필요합니다. <span id="pwState"></span></div>
-            <div class="field"><label>새 비밀번호 (4자리 이상)</label><input class="inp" id="pw1" type="password"></div>
-            <div class="field"><label>새 비밀번호 확인</label><input class="inp" id="pw2" type="password"></div>
-            <button class="btn btn-primary btn-block" onclick="doSetPw()">비밀번호 저장</button>
-          </div>
-        </div>
-        <div class="page" id="st-inspect">
-          <div class="card" style="padding:18px">
-            <p style="font-size:12.5px;color:var(--muted);margin-bottom:6px">갤럭시 탭·휴대폰·PC 화면을 미리 확인합니다.</p>
-            <div class="inspect-bar">
-              <button class="insp-btn on" onclick="setInspect('')">현재 화면</button><button class="insp-btn" onclick="setInspect('360')">Phone 360</button>
-              <button class="insp-btn" onclick="setInspect('412')">Phone 412</button><button class="insp-btn" onclick="setInspect('768')">Tab 세로</button>
-              <button class="insp-btn" onclick="setInspect('1024')">Tab 가로</button><button class="insp-btn" onclick="setInspect('1280')">PC 1280</button>
-            </div>
-          </div>
-        </div>
-        <div class="page" id="st-guide">
-          <div id="guideList"></div>
-        </div>
+      </section>
+      <section class="set-pane" id="pane-ver">
+        <h3>버전 이력 <span id="setCurVer" class="set-mut"></span>
+          <input id="setVerSearch" class="set-search" placeholder="검색" oninput="v060RenderVer()"></h3>
+        <div class="set-tblwrap" id="setVerWrap"><div class="set-mut">불러오는 중…</div></div>
       </section>
     </div>
   </div>
-  <nav class="mtab">
-    <button class="on" onclick="nav('home',this)"><span class="mi">▦</span>홈</button>
-    <button onclick="nav('create',this)"><span class="mi">＋</span>생성</button>
-    <button onclick="nav('ledger',this)"><span class="mi">▤</span>원장</button>
-    <button onclick="nav('redeem',this)"><span class="mi">◳</span>사용</button>
-    <button onclick="nav('records',this)"><span class="mi">≡</span>기록</button>
-  </nav>
 </div>
 
-<!-- ============ QR 사용처리(고객 QR 접속) 화면 ============ -->
-<div id="redeemApp" style="display:none">
-  <div class="topbar" style="position:static"><div class="store"><span class="dot"></span><span id="rTopStore">이태리식당 꽃반지</span></div><div class="spacer"></div><button class="icon-btn" id="rThemeBtn" onclick="cycleTheme()">☀</button></div>
-  <div class="redeem-wrap">
-    <div class="redeem-head"><div class="logo" id="rLogo">꽃</div><div style="font-weight:800;font-size:17px" id="rStore">이태리식당 꽃반지</div><div style="font-size:12px;color:var(--muted)">QR 금액권 사용처리</div></div>
-    <div id="redeemBody"><div class="empty">쿠폰 정보를 확인하는 중…</div></div>
-  </div>
-</div>
-
-<div class="modal-bg" id="modalBg"><div class="modal" id="modal"></div></div>
-<div class="toast" id="toast"></div>
+<style>
+  .set-wrap{display:grid;grid-template-columns:180px 1fr;gap:0;min-height:60vh;border:1px solid #2a3542;border-radius:10px;overflow:hidden}
+  .set-nav{background:#0f1722;border-right:1px solid #2a3542;display:flex;flex-direction:column;padding:8px}
+  .set-tab{background:transparent;border:1px solid transparent;color:#8b97a5;text-align:left;padding:9px 11px;border-radius:8px;cursor:pointer;font-size:13px;margin-bottom:2px}
+  .set-tab.on{background:rgba(56,225,176,.12);color:#38e1b0;border-color:#26313f}
+  .set-body{padding:18px 20px;background:#141b26}
+  .set-pane{display:none} .set-pane.on{display:block}
+  .set-pane h3{margin:0 0 8px;font-size:15px;color:#e6edf3}
+  .set-mut{color:#8b97a5;font-size:12px}
+  .set-row{display:flex;flex-direction:column;gap:5px;margin:12px 0;max-width:480px}
+  .set-row label{font-size:12px;color:#8b97a5}
+  .set-row input,.set-row textarea{background:#0d141d;border:1px solid #26313f;border-radius:8px;color:#e6edf3;padding:8px 10px;font-size:13px}
+  .set-led{margin-left:10px;font-size:12px;color:#8b97a5}
+  .set-led.ok{color:#3ddc97} .set-led.bad{color:#ff6b6b}
+  .set-log{background:#0d141d;border:1px solid #26313f;border-radius:8px;color:#8b97a5;padding:10px;font-size:11px;max-height:220px;overflow:auto;white-space:pre-wrap;margin-top:10px}
+  .set-mini{margin-top:10px;padding:16px;border:1px dashed #2a3542;border-radius:8px;color:#8b97a5;text-align:center}
+  .set-search{float:right;background:#0d141d;border:1px solid #26313f;border-radius:8px;color:#e6edf3;padding:6px 10px;font-size:12px;width:160px}
+  .set-tblwrap{margin-top:12px;overflow-x:auto;border:1px solid #26313f;border-radius:8px}
+  table.setver{width:100%;table-layout:fixed;border-collapse:collapse}
+  table.setver th,table.setver td{border-bottom:1px solid #26313f;border-right:1px solid #26313f;padding:8px 10px;font-size:12px;text-align:left;word-break:break-word}
+  table.setver th{background:#0f1722;color:#e6edf3} table.setver td{color:#8b97a5}
+  table.setver td.vc{color:#38e1b0;font-weight:600}
+  table.setver a{color:#38e1b0;text-decoration:none}
+  .ng-wrap{display:grid;grid-template-columns:1fr 300px;gap:12px;margin-top:12px;height:440px}
+  .ng-stage{position:relative;overflow:hidden;border:1px solid #26313f;border-radius:10px;background:
+     linear-gradient(#161f2b 1px,transparent 1px) 0 0/26px 26px,
+     linear-gradient(90deg,#161f2b 1px,transparent 1px) 0 0/26px 26px,
+     radial-gradient(800px 400px at 30% 20%,#101826,#0c1017 70%)}
+  .ng-stage svg{position:absolute;inset:0;width:100%;height:100%}
+  .ng-node{cursor:grab}
+  .ng-node rect{fill:#18222f;stroke:#2b3a4d;stroke-width:1.5;filter:drop-shadow(0 2px 6px rgba(0,0,0,.4))}
+  .ng-node.sys rect{stroke:#38e1b0}
+  .ng-node.sel rect{stroke:#38e1b0;stroke-width:2.5;filter:drop-shadow(0 0 10px #38e1b0)}
+  .ng-node text{fill:#e6edf3;font-size:12px;pointer-events:none}
+  .ng-node .sub{fill:#8b97a5;font-size:10px}
+  .ng-edge{fill:none;stroke:#26313f;stroke-width:1.6}
+  .ng-edge.lit{stroke:#38e1b0;stroke-opacity:.55;stroke-dasharray:5 7;animation:ngdash 1.1s linear infinite}
+  @keyframes ngdash{to{stroke-dashoffset:-24}}
+  .ng-particle{fill:#38e1b0}
+  .ng-side{border:1px solid #26313f;border-radius:10px;background:#0f1722;padding:12px;overflow:auto}
+  .ng-browser{border:1px solid #26313f;border-radius:8px;overflow:hidden;background:#0c1017}
+  .ng-bbar{display:flex;gap:5px;align-items:center;padding:7px 9px;background:#0f1620;border-bottom:1px solid #26313f}
+  .ng-dot{width:9px;height:9px;border-radius:50%}
+  .ng-bwin{display:grid;grid-template-columns:80px 1fr;min-height:150px}
+  .ng-bside{background:#0f1722;border-right:1px solid #26313f;padding:8px 6px}
+  .ng-bside .it{font-size:9px;color:#8b97a5;padding:5px;border-radius:5px;margin-bottom:2px}
+  .ng-bside .it.on{background:rgba(56,225,176,.14);color:#38e1b0}
+  .ng-bmain{padding:10px;display:flex;flex-direction:column;gap:7px}
+  .ng-m{border-radius:6px}
+  .ng-m.btn{background:#38e1b0;color:#04150f;font-size:10px;font-weight:600;padding:6px 10px;width:max-content}
+  .ng-m.inp{border:1px solid #26313f;background:#0d141d;color:#8b97a5;padding:6px 8px;font-size:10px}
+  .ng-m.pill{border:1px solid #26313f;border-radius:999px;padding:3px 10px;font-size:10px;color:#e6edf3;width:max-content;white-space:nowrap}
+  .ng-m.chart{display:flex;align-items:flex-end;gap:5px;height:58px;padding:7px;border:1px solid #26313f}
+  .ng-m.chart i{flex:1;background:linear-gradient(#38e1b0,#1c8f70);border-radius:3px 3px 0 0}
+  .ng-m.tbl{border:1px solid #26313f}
+  .ng-m.tbl .r{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid #26313f}
+  .ng-m.tbl .r:last-child{border-bottom:0}
+  .ng-m.tbl .c{padding:4px 6px;font-size:9px;color:#8b97a5;border-right:1px solid #26313f}
+  .ng-m.blk{height:20px;background:#0f1722;border:1px solid #26313f}
+  .ng-m.hl{outline:2px solid #38e1b0;outline-offset:2px}
+  .ng-desc{margin-top:10px;font-size:11px;color:#8b97a5;line-height:1.5}
+  .ng-clist{margin-top:6px;display:flex;flex-wrap:wrap;gap:5px}
+  .ng-clist span{font-size:10px;border:1px solid #26313f;border-radius:5px;padding:2px 7px;color:#e6edf3}
+  .ng-clist span.on{border-color:#38e1b0;color:#38e1b0}
+  .ng-empty{color:#8b97a5;font-size:11px;padding:16px 0}
+</style>
 
 <script>
-/* ===== HTMLService 템플릿 변수 ===== */
-var PAGE='<?= PAGE ?>', COUPON_ID='<?= COUPON_ID ?>', TOKEN='<?= TOKEN ?>', WEB_APP_URL='<?= WEB_APP_URL ?>';
-var STORE={name:'이태리식당 꽃반지',tel:'051-508-2850',addr1:'부산 기장군 철마면 여락송정로 334-15 1층',addr2:'부산 기장군 철마면 송정리 560-3',footer:'이 쿠폰은 이태리식당 꽃반지 식사 결제 시 사용 가능합니다.',amount:50000,theme:'light'};
-var curTpl='basic', ledgerFilter='all', logSheet='scan_logs', pendingTheme='light';
-
-/* ===== 서버 호출 래퍼 (google.script.run → Promise) ===== */
-function call(fn,arg){
-  return new Promise(function(res,rej){
-    if(typeof google==='undefined'||!google.script){ rej(new Error('서버 연결이 없습니다(로컬 미리보기).')); return; }
-    google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn](arg);
-  });
-}
-function toast(m){ var t=document.getElementById('toast'); t.textContent=m; t.classList.add('on'); setTimeout(function(){t.classList.remove('on');},2600); }
-function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function won(n){return (Number(n)||0).toLocaleString('ko-KR')+'원';}
-function openModal(h){document.getElementById('modal').innerHTML=h;document.getElementById('modalBg').classList.add('on');}
-function closeModal(){document.getElementById('modalBg').classList.remove('on');}
-
-/* ===== QR / 쿠폰 카드 ===== */
-function qrRectsSized(text){
-  var qr=qrcode(0,'M'); qr.addData(String(text||' ')); qr.make();
-  var n=qr.getModuleCount(), rects='';
-  for(var r=0;r<n;r++)for(var c=0;c<n;c++) if(qr.isDark(r,c)) rects+='<rect x="'+c+'" y="'+r+'" width="1.02" height="1.02"/>';
-  return {n:n,rects:rects};
-}
-function qrSVG(text){ var o=qrRectsSized(text), q=4, vb=o.n+q*2;
-  return '<svg viewBox="0 0 '+vb+' '+vb+'" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="'+vb+'" height="'+vb+'" fill="#fff"/><g fill="#1c1f26" transform="translate('+q+','+q+')">'+o.rects+'</g></svg>'; }
-function buildCouponCardSvg(c){
-  var F="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif";
-  var amount=(Number(c.amount)||0).toLocaleString('ko-KR');
-  var payload=c.qr_url || (c.coupon_id+'|'+(c.token||''));
-  var o=qrRectsSized(payload), q=4, mods=o.n+q*2, box=104, qx=98, qy=152, scale=(box/mods);
-  var tel=STORE.tel?'<text x="150" y="389" text-anchor="middle" font-family="'+F+'" font-size="8.5" fill="#8b919d">문의: '+esc(STORE.tel)+'</text>':'';
-  return '<svg viewBox="0 0 300 400" width="300" height="400" xmlns="http://www.w3.org/2000/svg">'+
-  '<rect x="6" y="6" width="288" height="388" rx="18" fill="#fff" stroke="#e7e3dc" stroke-width="1.5"/>'+
-  '<text x="26" y="40" font-family="'+F+'" font-size="15" font-weight="800" fill="#1c1f26">'+esc(STORE.name)+'</text>'+
-  '<text x="274" y="40" text-anchor="end" font-family="'+F+'" font-size="10.5" font-weight="700" fill="#d8492b">'+esc(c.coupon_type||'쿠폰')+'</text>'+
-  '<line x1="26" y1="56" x2="274" y2="56" stroke="#e7e3dc" stroke-dasharray="3 3"/>'+
-  '<text x="150" y="86" text-anchor="middle" font-family="'+F+'" font-size="13" font-weight="600" fill="#565b66">'+esc(c.coupon_name||'쿠폰')+'</text>'+
-  '<text x="150" y="126" text-anchor="middle" font-family="'+F+'" font-size="34" font-weight="900" fill="#d8492b">'+amount+'<tspan font-size="15" dx="2">원</tspan></text>'+
-  '<rect x="92" y="146" width="116" height="116" rx="8" fill="#fff" stroke="#eceae5"/>'+
-  '<g transform="translate('+qx+','+qy+') scale('+scale.toFixed(4)+')" fill="#1c1f26"><g transform="translate('+q+','+q+')">'+o.rects+'</g></g>'+
-  '<text x="150" y="286" text-anchor="middle" font-family="'+F+'" font-size="11.5" font-weight="700" fill="#565b66">'+esc(c.coupon_id||'')+'</text>'+
-  '<text x="150" y="304" text-anchor="middle" font-family="'+F+'" font-size="11" fill="#8b919d">유효기간 ~ '+esc(c.expires_at||'-')+'</text>'+
-  '<line x1="26" y1="320" x2="274" y2="320" stroke="#e7e3dc" stroke-dasharray="3 3"/>'+
-  '<text x="150" y="340" text-anchor="middle" font-family="'+F+'" font-size="9.5" fill="#8b919d">1회 사용 · 잔액 소멸 · 유효기간 이후 사용 불가</text>'+
-  '<text x="150" y="357" text-anchor="middle" font-family="'+F+'" font-size="9.5" fill="#565b66">'+esc(STORE.footer||'')+'</text>'+
-  '<text x="150" y="373" text-anchor="middle" font-family="'+F+'" font-size="8.5" fill="#8b919d">'+esc(STORE.addr1||'')+'</text>'+tel+'</svg>';
-}
-function svgToPng(svg,filename){return new Promise(function(resolve){try{
-  var blob=new Blob([svg],{type:'image/svg+xml;charset=utf-8'}),url=URL.createObjectURL(blob),img=new Image();
-  img.onload=function(){try{var sc=2,cv=document.createElement('canvas');cv.width=300*sc;cv.height=400*sc;var ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(img,0,0,cv.width,cv.height);
-    cv.toBlob(function(b){URL.revokeObjectURL(url);if(!b){resolve(false);return;}var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},1500);resolve(true);},'image/png');
-  }catch(e){URL.revokeObjectURL(url);resolve(false);}};
-  img.onerror=function(){URL.revokeObjectURL(url);resolve(false);};img.src=url;
-}catch(e){resolve(false);}});}
-function dlFile(name,content,type){try{var b=new Blob([content],{type:type}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},1500);return true;}catch(e){return false;}}
-function saveCard(c){
-  var svg=buildCouponCardSvg(c), base=STORE.name.replace(/\s+/g,'_')+'_'+c.coupon_id+'_'+(c.coupon_name||'쿠폰').replace(/\s+/g,'');
-  svgToPng(svg,base+'.png').then(function(ok){ if(!ok)ok=dlFile(base+'.svg',svg,'image/svg+xml'); toast(ok?'쿠폰 카드 이미지를 저장했습니다.':'저장할 수 없습니다. 다시 시도하세요.'); });
+/* ===== 환경설정 로직 (v0.7.3) ===== */
+window.v060ShowSettings = function(){
+  if(typeof requireCan==='function' && !requireCan('canManageSettings')){ return; }
+  if(typeof v060ClosePages==='function') v060ClosePages();
+  document.getElementById('v060SettingsPage')?.classList.add('open');
+  document.body.classList.add('v060-page-open');
+  v060SetTab('server');
+};
+window.v060SetTab = function(t){
+  document.querySelectorAll('#setNav .set-tab').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  document.querySelectorAll('.set-body .set-pane').forEach(p=>p.classList.remove('on'));
+  document.getElementById('pane-'+t)?.classList.add('on');
+  if(t==='ver') v060LoadVer();
+  if(t==='map') setTimeout(ng_render, 30);
+};
+function setSrv(){ return (document.getElementById('setSrvUrl')?.value||'http://127.0.0.1:9200').replace(/\/$/,''); }
+window.v060PingServer = async function(){
+  const el=document.getElementById('setSrvStat'); el.textContent='확인 중…'; el.className='set-led';
+  try{ const r=await fetch(setSrv()+'/health',{cache:'no-store'});
+    if(r.ok){ el.textContent='● 연결됨'; el.className='set-led ok'; } else { el.textContent='● 응답 오류'; el.className='set-led bad'; }
+  }catch(e){ el.textContent='● 연결 안 됨'; el.className='set-led bad'; }
+};
+window.v060Deploy = async function(){
+  const log=document.getElementById('setDeployLog'); log.textContent='업로드 중… (git add/commit/push)';
+  try{
+    const r=await fetch(setSrv()+'/api/deploy',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:document.getElementById('setDeployMsg').value||'Update'})});
+    const d=await r.json(); log.textContent=(d.ok?'✅ 업로드 완료\n\n':'❌ 실패\n\n')+(d.log||d.error||'');
+  }catch(e){ log.textContent='❌ 서버 연결 실패 — 로컬 서버(:9200)가 켜져 있는지 확인하세요.'; }
+};
+window.v060SaveDefaults = function(){
+  const comps=(document.getElementById('setCompanies').value||'').split('\n').map(x=>x.trim()).filter(Boolean);
+  const cnt=parseInt(document.getElementById('setDefCount').value,10)||1;
+  try{ localStorage.setItem('easypps.defaults', JSON.stringify({companies:comps,count:cnt})); }catch(e){}
+  // 회사 드롭다운 즉시 반영
+  const sel=document.getElementById('companySelect');
+  if(sel){ sel.innerHTML='<option value="" disabled selected>회사 선택</option>'+comps.map(c=>`<option value="${c}">${c}</option>`).join(''); }
+  const ic=document.getElementById('inspectCount'); if(ic) ic.value=cnt;
+  document.getElementById('setDefStat').textContent=' 저장됨 ('+comps.length+'개 회사, 기본 '+cnt+'회)';
+};
+/* 버전 이력 */
+const SET_SAMPLE=[{ver:'v0.7.3',title:'환경설정 6탭 통합',desc:'서버연결/웹배포/기본값/로그/시스템맵/버전이력 + 웹업로드 버튼',src:'',when:''}];
+async function v060LoadVer(){
+  try{ const r=await fetch(setSrv()+'/api/versions',{cache:'no-store'}); if(!r.ok)throw 0; window._setVer=await r.json(); }
+  catch(e){ window._setVer=SET_SAMPLE; }
+  v060RenderVer();
 }
 
-/* ===== 미리보기 카드 ===== */
-function previewCoupon(){return {coupon_id:'CPN-'+(new Date().toISOString().slice(0,10).replace(/-/g,''))+'-0000',
-  coupon_name:(document.getElementById('f_name')?document.getElementById('f_name').value:'쿠폰'),
-  amount:(document.getElementById('f_amount')?document.getElementById('f_amount').value:50000),
-  coupon_type:(document.getElementById('f_type')?document.getElementById('f_type').value:'무상 증정권'),
-  expires_at:(document.getElementById('f_valid')?document.getElementById('f_valid').value:''), token:'preview', qr_url:'PREVIEW'};}
-function renderCardPreview(c){
-  var el=document.getElementById('cardPrev'); if(!el)return;
-  el.innerHTML='<div class="ch"><div class="store-nm">'+esc(STORE.name)+'</div><div class="ctype">'+esc(c.coupon_type)+'</div></div>'+
-  '<div class="cname">'+esc(c.coupon_name)+'</div><div class="cvalue">'+(Number(c.amount)||0).toLocaleString('ko-KR')+'<small>원</small></div>'+
-  '<div class="qrbox">'+qrSVG(c.qr_url&&c.qr_url!=='PREVIEW'?c.qr_url:'PREVIEW|'+c.coupon_id)+'</div>'+
-  '<div class="cno2">'+esc(c.coupon_id)+'</div><div class="cdate">유효기간 ~ '+esc(c.expires_at||'-')+'</div>'+
-  '<div class="cfoot">1회 사용 · 잔액 소멸 · 유효기간 이후 사용 불가<br>'+esc(STORE.footer)+'<br>'+esc(STORE.addr1)+(STORE.tel?'<br>문의: '+esc(STORE.tel):'')+'</div>';
-}
-function syncCard(){ renderCardPreview(previewCoupon()); }
-function pickTpl(el,t){document.querySelectorAll('.tp').forEach(function(x){x.classList.remove('on');});el.classList.add('on');curTpl=t;syncCard();}
+/* ===== 인라인 노드그래프 (ng_ 네임스페이스, 환경설정 시스템 맵 탭) ===== */
+var NG_SYS = {
+  name:"easy_paper 로그서버", port:9200, role:"검사성적서 앱 + 로컬 로그",
+  flow:["요청","라우팅","응답"],
+  pages:[
+    { name:"검사성적서", desc:"도면 업로드→분석→성적서 생성 5단계.", comp:["회사 선택","검사횟수 입력","파일 업로드","분석 실행","결과 다운로드"] },
+    { name:"환경설정", desc:"관리자 전용. 6개 세부 탭.", comp:["서버 연결 테스트","웹페이지 업로드 버튼","회사 목록","로그 관리","버전 이력 표"] },
+    { name:"로그 대시보드", desc:"로컬 SQLite 로그 조회.", comp:["검색 입력","상태 배지","로그 테이블","통계 카드","CSV 다운로드"] },
+    { name:"넘버링 작업실", desc:"측정점 넘버링 좌표 편집.", comp:["좌표 리스트","저장 버튼","도면 미리보기"] }
+  ]
+};
+var NG_LSKEY='easypps.ng.pos', NG_NS='http://www.w3.org/2000/svg', ng_pos=null, ng_sel=null;
+function ng_svg(){ return document.getElementById('ngSvg'); }
+function ng_default(){ var svg=ng_svg(), H=(svg&&svg.clientHeight)||420, p={}; p['sys']={x:40,y:H/2-30};
+  var pn=NG_SYS.pages.length;
+  NG_SYS.pages.forEach(function(pg,i){ p['p'+i]={x:260,y:40+i*((H-90)/(pn-1||1))};
+    pg.comp.forEach(function(c,j){ p['p'+i+'c'+j]={x:520,y:24+(i*84+j*24)}; }); });
+  return p; }
+function ng_load(){ try{return JSON.parse(localStorage.getItem(NG_LSKEY))||ng_default();}catch(e){return ng_default();} }
+function ng_save(){ localStorage.setItem(NG_LSKEY, JSON.stringify(ng_pos)); }
+window.ng_reset=function(){ ng_pos=ng_default(); ng_save(); ng_render(); };
+function ng_type(n){ var s=n.toLowerCase();
+  if(/버튼|실행|저장|발행|업로드|다운로드|수집|테스트/.test(n))return'btn';
+  if(/검색|입력|토큰/.test(n)||/api/.test(s))return'inp';
+  if(/표|테이블|리스트|목록|로그|결과|이력/.test(n))return'tbl';
+  if(/차트|추이|위젯|미리보기|카드|통계/.test(n))return'chart';
+  if(/탭|배지/.test(n))return'pill'; return'blk'; }
+function ng_mock(n){ var t=ng_type(n);
+  if(t==='btn')return'<div class="ng-m btn" data-c="'+n+'">'+n+'</div>';
+  if(t==='inp')return'<div class="ng-m inp" data-c="'+n+'">'+n+'…</div>';
+  if(t==='pill')return'<div class="ng-m pill" data-c="'+n+'">'+n+'</div>';
+  if(t==='chart')return'<div class="ng-m chart" data-c="'+n+'"><i style="height:40%"></i><i style="height:75%"></i><i style="height:55%"></i><i style="height:90%"></i><i style="height:35%"></i></div>';
+  if(t==='tbl')return'<div class="ng-m tbl" data-c="'+n+'"><div class="r"><div class="c">'+n+'</div><div class="c">—</div><div class="c">OK</div></div></div>';
+  return'<div class="ng-m blk" data-c="'+n+'"></div>'; }
+function ng_box(id,title,sub,cls){ var p=ng_pos[id]||{x:0,y:0},w=Math.max(88,title.length*8+24),h=sub?42:30;
+  var g=document.createElementNS(NG_NS,'g'); g.setAttribute('class','ng-node '+(cls||'')+(ng_sel===id?' sel':''));
+  g.setAttribute('transform','translate('+p.x+','+p.y+')'); g.dataset.id=id; g.dataset.w=w; g.dataset.h=h;
+  var r=document.createElementNS(NG_NS,'rect'); r.setAttribute('width',w); r.setAttribute('height',h); r.setAttribute('rx',9); g.appendChild(r);
+  var t=document.createElementNS(NG_NS,'text'); t.setAttribute('x',11); t.setAttribute('y',sub?17:19); t.textContent=title; g.appendChild(t);
+  if(sub){var sb=document.createElementNS(NG_NS,'text'); sb.setAttribute('class','sub'); sb.setAttribute('x',11); sb.setAttribute('y',32); sb.textContent=sub; g.appendChild(sb);}
+  return g; }
+function ng_center(id){ var p=ng_pos[id], el=ng_svg().querySelector('[data-id="'+id+'"]'), w=el?+el.dataset.w:90, h=el?+el.dataset.h:30;
+  return {x:p.x+w,y:p.y+h/2,x0:p.x,y0:p.y+h/2}; }
+function ng_curve(a,b,lit){ var p=document.createElementNS(NG_NS,'path'), mx=(a.x+b.x0)/2;
+  p.setAttribute('d','M '+a.x+' '+a.y+' C '+mx+' '+a.y+' '+mx+' '+b.y0+' '+b.x0+' '+b.y0); p.setAttribute('class','ng-edge'+(lit?' lit':'')); return p; }
+function ng_part(a,b){ var mx=(a.x+b.x0)/2, path='M '+a.x+' '+a.y+' C '+mx+' '+a.y+' '+mx+' '+b.y0+' '+b.x0+' '+b.y0;
+  var c=document.createElementNS(NG_NS,'circle'); c.setAttribute('r',2.4); c.setAttribute('class','ng-particle');
+  var m=document.createElementNS(NG_NS,'animateMotion'); m.setAttribute('dur',(1.6+Math.random()*0.8)+'s'); m.setAttribute('repeatCount','indefinite'); m.setAttribute('path',path); c.appendChild(m); return c; }
+window.ng_render=function(){ var svg=ng_svg(); if(!svg) return; if(!ng_pos) ng_pos=ng_load(); svg.innerHTML='';
+  var edges=document.createElementNS(NG_NS,'g'),parts=document.createElementNS(NG_NS,'g'),nodes=document.createElementNS(NG_NS,'g');
+  svg.appendChild(edges); svg.appendChild(parts); svg.appendChild(nodes);
+  nodes.appendChild(ng_box('sys',NG_SYS.name,':'+NG_SYS.port,'sys'));
+  NG_SYS.pages.forEach(function(pg,i){ nodes.appendChild(ng_box('p'+i,pg.name,pg.comp.length+'개','page'));
+    pg.comp.forEach(function(c,j){ nodes.appendChild(ng_box('p'+i+'c'+j,c,'','comp')); }); });
+  NG_SYS.pages.forEach(function(pg,i){ var litA=ng_sel&&(ng_sel==='p'+i||ng_sel.indexOf('p'+i+'c')===0); var a=ng_center('sys'),b=ng_center('p'+i);
+    edges.appendChild(ng_curve(a,b,litA)); if(litA)parts.appendChild(ng_part(a,b));
+    pg.comp.forEach(function(c,j){ var litB=ng_sel===('p'+i+'c'+j)||ng_sel==='p'+i; var a2=ng_center('p'+i),b2=ng_center('p'+i+'c'+j);
+      edges.appendChild(ng_curve(a2,b2,litB)); if(litB)parts.appendChild(ng_part(a2,b2)); }); });
+  ng_drag(); };
+function ng_drag(){ ng_svg().querySelectorAll('.ng-node').forEach(function(g){
+  g.addEventListener('pointerdown',function(e){ e.preventDefault(); g.setPointerCapture(e.pointerId);
+    var id=g.dataset.id,sx=e.clientX,sy=e.clientY,base={x:ng_pos[id].x,y:ng_pos[id].y},moved=false,svg=ng_svg();
+    function mv(ev){ var dx=ev.clientX-sx,dy=ev.clientY-sy; if(Math.abs(dx)>4||Math.abs(dy)>4)moved=true;
+      if(moved){ ng_pos[id]={x:base.x+dx,y:base.y+dy}; g.setAttribute('transform','translate('+ng_pos[id].x+','+ng_pos[id].y+')'); ng_render(); } }
+    function up(){ g.releasePointerCapture(e.pointerId); svg.removeEventListener('pointermove',mv); svg.removeEventListener('pointerup',up); if(moved)ng_save(); else ng_click(id); }
+    svg.addEventListener('pointermove',mv); svg.addEventListener('pointerup',up); }); }); }
+function ng_click(id){ ng_sel=id; if(id==='sys'){ ng_render(); ng_showSys(); return; }
+  var pi,cj=null; if(id.indexOf('c')>=0){ var m=id.match(/^p(\d+)c(\d+)$/); pi=+m[1]; cj=+m[2]; } else pi=+id.slice(1);
+  ng_render(); ng_showPage(pi,cj); }
+function ng_showSys(){ document.getElementById('ngPvTitle').textContent='시스템 개요';
+  document.getElementById('ngPreview').innerHTML='<div class="ng-browser"><div class="ng-bbar"><span class="ng-dot" style="background:#ff5f56"></span><span class="ng-dot" style="background:#ffbd2e"></span><span class="ng-dot" style="background:#27c93f"></span></div><div class="ng-bwin"><div class="ng-bside">'+NG_SYS.pages.map(function(p){return'<div class="it">'+p.name+'</div>';}).join('')+'</div><div class="ng-bmain">'+NG_SYS.flow.map(function(f){return'<div class="ng-m pill">'+f+'</div>';}).join('')+'</div></div></div>';
+  document.getElementById('ngPvDesc').textContent='역할: '+NG_SYS.role+' · 흐름: '+NG_SYS.flow.join(' → '); document.getElementById('ngPvComp').innerHTML=''; }
+function ng_showPage(pi,cj){ var pg=NG_SYS.pages[pi]; document.getElementById('ngPvTitle').textContent=pg.name+' · 미리보기';
+  var side=NG_SYS.pages.map(function(p,k){return'<div class="it '+(k===pi?'on':'')+'">'+p.name+'</div>';}).join(''); var main=pg.comp.map(function(c){return ng_mock(c);}).join('');
+  document.getElementById('ngPreview').innerHTML='<div class="ng-browser"><div class="ng-bbar"><span class="ng-dot" style="background:#ff5f56"></span><span class="ng-dot" style="background:#ffbd2e"></span><span class="ng-dot" style="background:#27c93f"></span></div><div class="ng-bwin"><div class="ng-bside">'+side+'</div><div class="ng-bmain">'+main+'</div></div></div>';
+  if(cj!=null){ var el=document.querySelector('#ngPreview [data-c="'+(window.CSS&&CSS.escape?CSS.escape(pg.comp[cj]):pg.comp[cj])+'"]'); if(el)el.classList.add('hl'); }
+  document.getElementById('ngPvDesc').textContent=pg.desc||''; document.getElementById('ngPvComp').innerHTML=pg.comp.map(function(c,j){return'<span class="'+(cj===j?'on':'')+'">'+c+'</span>';}).join(''); }
 
-/* ===== 테마 / 검수 ===== */
-function applyTheme(t){var eff=t;if(t==='system')eff=(window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches)?'dark':'light';document.body.setAttribute('data-theme',eff);
-  var b=document.getElementById('themeBtn'),rb=document.getElementById('rThemeBtn');var ic=t==='dark'?'🌙':t==='system'?'🖥':'☀';if(b)b.textContent=ic;if(rb)rb.textContent=ic;}
-function cycleTheme(){var o=['light','dark','system'];STORE.theme=o[(o.indexOf(STORE.theme)+1)%3];pendingTheme=STORE.theme;applyTheme(STORE.theme);}
-function pickTheme(el,t){document.querySelectorAll('#st-store .opt').forEach(function(x){x.classList.remove('on');});el.classList.add('on');pendingTheme=t;applyTheme(t);}
-function setInspect(vp){document.body.classList.remove('inspect','vp-360','vp-412','vp-768','vp-1024','vp-1280');if(vp)document.body.classList.add('inspect','vp-'+vp);
-  document.querySelectorAll('#st-inspect .insp-btn').forEach(function(b){b.classList.remove('on');});event.target.classList.add('on');}
-
-/* ===== 네비 ===== */
-function nav(p,mtabBtn){
-  document.querySelectorAll('#adminApp .page').forEach(function(s){ if(s.id.indexOf('pg-')===0) s.classList.remove('on'); });
-  var pg=document.getElementById('pg-'+p); if(pg)pg.classList.add('on');
-  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.toggle('on',n.dataset.p===p);});
-  document.querySelectorAll('.mtab button').forEach(function(b){b.classList.remove('on');}); if(mtabBtn)mtabBtn.classList.add('on');
-  if(p==='home')loadHome(); else if(p==='ledger')loadLedger(); else if(p==='records')loadRecords(); else if(p==='logs')loadLog(); else if(p==='create')syncCard();
-  if(window.innerWidth<=760){document.querySelector('.sidebar').style.display='none';}
-}
-function toggleSide(){var s=document.querySelector('.sidebar');s.style.display=s.style.display==='block'?'none':'block';}
-
-/* ===== 데이터 로드 ===== */
-function loadHome(){
-  call('getDashboard').then(function(d){
-    document.getElementById('homeStats').innerHTML=
-      sc('','오늘 생성',d.todayCreated,'장')+sc('accent','오늘 사용처리',d.todayUsed,'건')+
-      sc('','미사용',d.unused,'장')+sc('','사용완료',d.used,'장')+
-      sc('warn','만료 예정',d.expiring,'장')+sc('danger','무효',d.voidc,'건')+
-      sc('info','오늘 추가결제',Math.round((d.todayExtra||0)/1000),'천')+sc('warn','오늘 소멸',Math.round((d.todayForfeit||0)/1000),'천');
-  }).catch(showErr);
-}
-function sc(cls,k,v,u){return '<div class="card stat '+cls+'"><div class="k">'+k+'</div><div class="v">'+(v||0)+'<small>'+(u||'')+'</small></div></div>';}
-function loadLedger(){
-  call('listCoupons').then(function(rows){
-    var f=rows.filter(function(c){var st=String(c.status);if(ledgerFilter==='all')return true;if(ledgerFilter==='expired')return st==='unused'&&c.expires_at&&String(c.expires_at)<today();if(ledgerFilter==='void')return st==='void'||st==='cancelled';return st===ledgerFilter;});
-    var b=document.getElementById('ledgerBody');
-    if(!rows.length){b.innerHTML='<tr><td colspan="7"><div class="empty">아직 생성된 쿠폰이 없습니다.<small>쿠폰을 생성하면 이곳에 표시됩니다.</small><br><button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="nav(\'create\')">쿠폰 생성하기</button></div></td></tr>';return;}
-    if(!f.length){b.innerHTML='<tr><td colspan="7"><div class="empty">조건에 맞는 쿠폰이 없습니다.</div></td></tr>';return;}
-    b.innerHTML=f.map(function(c){var st=stbadge(c);return '<tr><td class="mono">'+esc(c.coupon_id)+'</td><td>'+esc(c.coupon_name)+'</td><td class="amt">'+won(c.amount)+'</td><td>'+st+'</td><td class="mono">'+esc(c.expires_at)+'</td><td class="mono">'+esc(String(c.issued_at).slice(0,10))+'</td><td><button class="btn btn-ghost btn-sm" onclick=\'openCoupon('+JSON.stringify(JSON.stringify(c))+')\'>상세</button></td></tr>';}).join('');
-  }).catch(showErr);
-}
-function stbadge(c){var st=String(c.status);if(st==='unused'&&c.expires_at&&String(c.expires_at)<today())return '<span class="badge-st b-expired">만료</span>';
-  var m={unused:['b-unused','미사용'],used:['b-used','사용완료'],void:['b-void','무효'],cancelled:['b-cancelled','취소']};var x=m[st]||['b-void',st];return '<span class="badge-st '+x[0]+'">'+x[1]+'</span>';}
-function today(){return new Date().toISOString().slice(0,10);}
-function loadRecords(){
-  call('listUsageLogs').then(function(rows){
-    var b=document.getElementById('recordsBody');
-    if(!rows.length){b.innerHTML='<tr><td colspan="8"><div class="empty">아직 사용 기록이 없습니다.<small>QR 쿠폰을 사용처리하면 이곳에 표시됩니다.</small></div></td></tr>';return;}
-    b.innerHTML=rows.map(function(u){var cancelled=String(u.cancel_status)==='cancelled';return '<tr><td class="mono">'+esc(u.used_at)+'</td><td class="mono">'+esc(u.coupon_id)+'</td><td>'+esc(u.coupon_name)+'</td><td class="mono">'+won(u.meal_amount)+'</td><td class="mono">'+won(u.applied_amount)+'</td><td class="mono">'+(Number(u.extra_payment_amount)?'+'+won(u.extra_payment_amount):'-')+'</td><td class="mono">'+(Number(u.forfeited_amount)?won(u.forfeited_amount):'-')+'</td><td>'+(cancelled?'<span class="badge-st b-cancelled">취소됨</span>':'<span class="badge-st b-used">정상</span>')+'</td></tr>';}).join('');
-  }).catch(showErr);
-}
-function setLog(el,sheet){document.querySelectorAll('#logTabs .subtab').forEach(function(t){t.classList.remove('on');});el.classList.add('on');logSheet=sheet;loadLog();}
-function loadLog(){
-  var fnMap={scan_logs:'listScanLogs',admin_logs:'listAdminLogs',usage_logs:'listUsageLogs',export_logs:'listExportLogs'};
-  call(fnMap[logSheet]).then(function(rows){
-    var head=document.getElementById('logHead'), body=document.getElementById('logBody');
-    if(!rows.length){head.innerHTML='';body.innerHTML='<tr><td><div class="empty">아직 로그가 없습니다.<small>쿠폰 생성, 사용처리, 내보내기 작업이 발생하면 기록됩니다.</small></div></td></tr>';return;}
-    var cols=Object.keys(rows[0]).filter(function(k){return k!=='_row';});
-    head.innerHTML='<tr>'+cols.map(function(c){return '<th>'+c+'</th>';}).join('')+'</tr>';
-    body.innerHTML=rows.map(function(r){return '<tr>'+cols.map(function(c){return '<td class="mono">'+esc(r[c])+'</td>';}).join('')+'</tr>';}).join('');
-  }).catch(showErr);
-}
-function setLF(el,f){document.querySelectorAll('#ledgerChips .subtab').forEach(function(t){t.classList.remove('on');});el.classList.add('on');ledgerFilter=f;loadLedger();}
-function setST(el,id){document.querySelectorAll('#setTabs .subtab').forEach(function(t){t.classList.remove('on');});el.classList.add('on');
-  document.querySelectorAll('#pg-settings .page').forEach(function(s){s.classList.remove('on');});document.getElementById('st-'+id).classList.add('on');
-  if(id==='guide')renderGuide();}
-
-/* ===== 생성 ===== */
-function doCreate(){
-  var btn=document.getElementById('createBtn');btn.disabled=true;btn.textContent='생성 중…';
-  var payload={name:document.getElementById('f_name').value.trim()||'쿠폰',amount:parseInt(document.getElementById('f_amount').value,10),
-    qty:Math.max(parseInt(document.getElementById('f_qty').value,10)||1,1),type:document.getElementById('f_type').value,
-    valid:document.getElementById('f_valid').value||'',memo:document.getElementById('f_memo').value,admin_name:'관리자'};
-  call('createCoupon',payload).then(function(r){
-    btn.disabled=false;btn.textContent='쿠폰 생성';
-    if(!r.ok){toast('생성 실패: '+(r.reason||''));return;}
-    var c=r.coupons[0];
-    openModal('<div class="modal-head"><h3>✓ 쿠폰 생성 완료</h3><button class="icon-btn" onclick="closeModal()">✕</button></div>'+
-      '<div class="modal-body"><div class="coupon-img" id="modalCard"></div></div>'+
-      '<div class="modal-foot"><button class="btn btn-ghost btn-block" onclick=\'saveCardJson('+JSON.stringify(JSON.stringify(c))+')\'>쿠폰 카드 저장</button><button class="btn btn-primary btn-block" onclick="closeModal();nav(\'ledger\')">쿠폰 원장 보기</button></div>');
-    document.getElementById('modalCard').innerHTML=cardHtml(c);
-  }).catch(function(e){btn.disabled=false;btn.textContent='쿠폰 생성';showErr(e);});
-}
-function cardHtml(c){return '<div class="ch"><div class="store-nm">'+esc(STORE.name)+'</div><div class="ctype">'+esc(c.coupon_type)+'</div></div>'+
-  '<div class="cname">'+esc(c.coupon_name)+'</div><div class="cvalue">'+(Number(c.amount)||0).toLocaleString('ko-KR')+'<small>원</small></div>'+
-  '<div class="qrbox">'+qrSVG(c.qr_url||(c.coupon_id+'|'+c.token))+'</div><div class="cno2">'+esc(c.coupon_id)+'</div><div class="cdate">유효기간 ~ '+esc(c.expires_at)+'</div>'+
-  '<div class="cfoot">1회 사용 · 잔액 소멸 · 유효기간 이후 사용 불가<br>'+esc(STORE.footer)+'<br>'+esc(STORE.addr1)+(STORE.tel?'<br>문의: '+esc(STORE.tel):'')+'</div>';}
-function saveCardJson(j){saveCard(JSON.parse(j));}
-function openCoupon(j){var c=JSON.parse(j);
-  openModal('<div class="modal-head"><h3>쿠폰 상세</h3><button class="icon-btn" onclick="closeModal()">✕</button></div>'+
-    '<div class="modal-body"><div class="coupon-img" id="modalCard"></div>'+
-    '<div class="kv"><span class="k">상태</span><span class="v">'+stbadgeText(c)+'</span></div>'+
-    '<div class="kv"><span class="k">QR URL</span><span class="v" style="font-size:10px;word-break:break-all">'+esc(c.qr_url)+'</span></div></div>'+
-    '<div class="modal-foot"><button class="btn btn-ghost btn-block" onclick=\'saveCardJson('+JSON.stringify(JSON.stringify(c))+')\'>쿠폰 카드 저장</button>'+
-    '<button class="btn btn-ghost btn-block" onclick="copyUrl('+JSON.stringify(c.qr_url)+')">QR URL 복사</button></div>');
-  document.getElementById('modalCard').innerHTML=cardHtml(c);
-}
-function stbadgeText(c){return stbadge(c);}
-function copyUrl(u){if(navigator.clipboard){navigator.clipboard.writeText(u).then(function(){toast('QR URL을 복사했습니다.');});}else toast('복사를 지원하지 않습니다.');}
-
-/* ===== 조회(관리자 수동) ===== */
-function doLookup(){
-  var no=(document.getElementById('lookupNo').value||'').trim();if(!no){toast('쿠폰번호를 입력하세요.');return;}
-  call('verifyCoupon',{couponId:no,token:null}).then(function(r){
-    var el=document.getElementById('lookupResult');
-    if(!r.ok){el.innerHTML='<div class="note warn" style="margin-top:12px">등록되지 않은 쿠폰입니다.</div>';return;}
-    var c=r.coupon, label={valid:'사용 가능',used:'사용완료',void:'무효',cancelled:'취소됨',expired:'만료'}[r.result]||r.result;
-    el.innerHTML='<div class="card" style="padding:14px;margin-top:12px"><div class="kv"><span class="k">'+esc(c.coupon_name)+'</span><span class="v">'+won(c.amount)+'</span></div><div class="kv"><span class="k">상태</span><span class="v">'+label+'</span></div><div class="kv"><span class="k">유효기간</span><span class="v mono">'+esc(c.expires_at)+'</span></div></div>';
-  }).catch(showErr);
-}
-
-/* ===== 설정 저장 ===== */
-function fillSettings(){
-  document.getElementById('s_name').value=STORE.name;document.getElementById('s_tel').value=STORE.tel;
-  document.getElementById('s_addr1').value=STORE.addr1;document.getElementById('s_addr2').value=STORE.addr2;
-  document.getElementById('s_footer').value=STORE.footer;document.getElementById('s_amount').value=STORE.amount;
-}
-function doSaveSettings(){
-  var p={store_name:document.getElementById('s_name').value,store_tel:document.getElementById('s_tel').value,
-    store_addr1:document.getElementById('s_addr1').value,store_addr2:document.getElementById('s_addr2').value,
-    coupon_footer:document.getElementById('s_footer').value,default_amount:document.getElementById('s_amount').value,
-    theme:pendingTheme,admin_name:'관리자'};
-  call('saveSettings',p).then(function(){ STORE.name=p.store_name;STORE.tel=p.store_tel;STORE.addr1=p.store_addr1;STORE.addr2=p.store_addr2;STORE.footer=p.coupon_footer;STORE.amount=parseInt(p.default_amount,10)||50000;STORE.theme=p.theme;
-    applyStoreToUI();applyTheme(STORE.theme);toast('설정이 저장되었습니다. Google Sheet에 반영되었습니다.');}).catch(showErr);
-}
-function applyStoreToUI(){['sideStore','topStore'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=STORE.name;});
-  var l=document.getElementById('sideLogo');if(l)l.textContent=(STORE.name||'꽃').trim().charAt(0);syncCard();}
-function doSetPw(){
-  var a=document.getElementById('pw1').value,b=document.getElementById('pw2').value;
-  if(a.length<4){toast('비밀번호는 4자리 이상이어야 합니다.');return;}
-  if(a!==b){toast('비밀번호 확인이 일치하지 않습니다.');return;}
-  call('setAdminPassword',{password:a,admin_name:'관리자'}).then(function(r){if(r.ok){document.getElementById('pw1').value='';document.getElementById('pw2').value='';document.getElementById('pwState').textContent='설정됨 ✓';toast('관리자 비밀번호가 설정되었습니다.');}else toast(r.reason||'설정 실패');}).catch(showErr);
-}
-function doExportCsv(){ call('exportCsv',{sheet:logSheet,admin_name:'관리자'}).then(function(r){if(r.ok){dlFile(r.filename,r.csv,'text/csv;charset=utf-8');toast('CSV를 내보냈습니다.');}else toast(r.reason||'내보내기 실패');}).catch(showErr);}
-
-/* ===== 사용설명서 ===== */
-function renderGuide(){
-  var G=[['1','쿠폰 생성 방법','쿠폰 생성 메뉴에서 쿠폰명·금액·유효기간을 입력하고 <b>쿠폰 생성</b>을 누르면 Google Sheet 원장에 즉시 기록됩니다.'],
-   ['2','QR 쿠폰 카드 저장','생성 완료 화면 또는 쿠폰 상세에서 <b>쿠폰 카드 저장</b>을 누르면 전체 카드 이미지(매장명·금액·QR·번호·전화)가 저장됩니다.'],
-   ['3','고객에게 QR 전달','저장한 쿠폰 카드 이미지를 카카오톡·문자 등으로 고객에게 전달합니다.'],
-   ['4','쿠폰 사용처리','고객이 제시한 QR을 카메라로 스캔하면 사용처리 링크가 열립니다. 관리자 비밀번호와 식사금액을 입력해 사용처리합니다.'],
-   ['5','이미 사용된 쿠폰 차단','사용완료·무효·취소·만료 쿠폰은 다시 사용할 수 없습니다. 사용처리 직전 서버가 Sheet 최신 상태를 재확인합니다.'],
-   ['6','사용기록 확인','사용 기록·로그 메뉴에서 Google Sheet에 기록된 내역을 확인합니다.'],
-   ['7','Google Sheet 원장 관리','메인 데이터는 Google Sheet입니다. 시트를 직접 수정하면 원장이 손상될 수 있으니 가급적 화면에서 작업하세요.'],
-   ['8','관리자 비밀번호 관리','비밀번호는 서버에서 해시로만 저장됩니다. 분실 시 설정 화면에서 새로 설정하세요.']];
-  document.getElementById('guideList').innerHTML=G.map(function(g){return '<div class="card" style="padding:14px;margin-bottom:10px"><div style="font-weight:800;font-size:13.5px;margin-bottom:5px"><span style="display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;background:var(--brand);color:#fff;font-size:11px;margin-right:7px">'+g[0]+'</span>'+g[1]+'</div><div style="font-size:13px;color:var(--ink-soft);line-height:1.6;padding-left:30px">'+g[2]+'</div></div>';}).join('');
-}
-function showErr(e){toast('서버 오류: '+(e&&e.message?e.message:e));}
-
-/* ===== redeem(고객 QR 접속) ===== */
-function initRedeem(){
-  document.getElementById('redeemApp').style.display='block';
-  loadSettingsThen(function(){ applyRedeemStore();
-    call('verifyCoupon',{couponId:COUPON_ID,token:TOKEN}).then(renderRedeem).catch(function(e){
-      document.getElementById('redeemBody').innerHTML='<div class="rstate block"><div class="ic">⚠</div><div class="t">확인 실패</div><div class="s">'+esc(e&&e.message?e.message:e)+'</div></div>';});
-  });
-}
-function applyRedeemStore(){var s=document.getElementById('rStore'),t=document.getElementById('rTopStore'),l=document.getElementById('rLogo');if(s)s.textContent=STORE.name;if(t)t.textContent=STORE.name;if(l)l.textContent=(STORE.name||'꽃').charAt(0);}
-function renderRedeem(r){
-  var body=document.getElementById('redeemBody');
-  if(!r.ok||r.result!=='valid'){
-    var msg={used:['이미 사용된 쿠폰','이 쿠폰은 이미 사용 처리되었습니다.'],void:['무효 쿠폰','무효화된 쿠폰입니다.'],cancelled:['취소된 쿠폰','사용취소된 쿠폰입니다.'],expired:['유효기간 만료','유효기간이 지났습니다.'],token_mismatch:['인증 불일치','QR 인증값이 일치하지 않습니다.'],not_found:['등록되지 않은 쿠폰','원장에 없는 쿠폰입니다.']}[r.result]||['사용 불가','사용처리할 수 없습니다.'];
-    body.innerHTML='<div class="rstate block"><div class="ic">⊘</div><div class="t">'+msg[0]+'</div><div class="s">'+msg[1]+'</div></div>';return;
-  }
-  var c=r.coupon;
-  body.innerHTML='<div class="rstate valid"><div class="ic">✓</div><div class="t">사용 가능 쿠폰</div><div class="s">'+esc(c.coupon_name)+' · '+won(c.amount)+'</div></div>'+
-   '<div class="card" style="padding:16px"><div class="kv"><span class="k">쿠폰번호</span><span class="v mono">'+esc(c.coupon_id)+'</span></div><div class="kv"><span class="k">유효기간</span><span class="v mono">'+esc(c.expires_at)+'</span></div></div>'+
-   '<div class="field" style="margin-top:16px"><label>관리자 비밀번호</label><input class="inp" id="rPw" type="password" placeholder="사용처리 권한 확인"></div>'+
-   '<div class="field"><label>식사금액</label><input class="inp" id="rMeal" type="number" inputmode="numeric" placeholder="예: 40000" oninput="rCalc('+c.amount+')"></div>'+
-   '<div class="card" id="rCalcBox" style="padding:12px;display:none;margin-bottom:14px"><div class="kv"><span class="k">적용금액</span><span class="v" id="rApply">-</span></div><div class="kv"><span class="k">추가 결제</span><span class="v" id="rExtra">-</span></div><div class="kv"><span class="k">소멸 잔액</span><span class="v" id="rForfeit">-</span></div></div>'+
-   '<button class="btn btn-primary btn-block" id="rBtn" onclick="doRedeem('+JSON.stringify(esc(c.coupon_id))+')">사용처리</button>';
-}
-function rCalc(amount){var meal=parseInt(document.getElementById('rMeal').value,10)||0,box=document.getElementById('rCalcBox');
-  if(meal<=0){box.style.display='none';return;}box.style.display='block';
-  var ap=Math.min(amount,meal),ex=Math.max(meal-amount,0),fo=Math.max(amount-meal,0);
-  document.getElementById('rApply').textContent=won(ap);document.getElementById('rExtra').textContent=ex>0?'+ '+won(ex):won(0);document.getElementById('rForfeit').textContent=fo>0?won(fo)+' (소멸)':won(0);}
-function doRedeem(cid){
-  var pw=document.getElementById('rPw').value,meal=parseInt(document.getElementById('rMeal').value,10)||0;
-  if(!pw){toast('관리자 비밀번호를 입력하세요.');return;}
-  if(meal<=0){toast('식사금액을 입력하세요.');return;}
-  var btn=document.getElementById('rBtn');btn.disabled=true;btn.textContent='처리 중…';
-  call('redeemCoupon',{couponId:cid,token:TOKEN,password:pw,mealAmount:meal,admin_name:'관리자',device:navigator.userAgent}).then(function(r){
-    if(!r.ok){btn.disabled=false;btn.textContent='사용처리';toast(r.reason||'사용처리 실패');return;}
-    document.getElementById('redeemBody').innerHTML='<div class="rstate valid"><div class="ic">✓</div><div class="t">사용처리 완료</div><div class="s">'+esc(cid)+'</div></div>'+
-     '<div class="card" style="padding:16px"><div class="kv"><span class="k">적용금액</span><span class="v big">'+won(r.applied)+'</span></div><div class="kv"><span class="k">추가 결제</span><span class="v">'+won(r.extra)+'</span></div><div class="kv"><span class="k">소멸 잔액</span><span class="v">'+won(r.forfeited)+'</span></div><div class="kv"><span class="k">처리 시각</span><span class="v mono">'+esc(r.used_at)+'</span></div></div>';
-  }).catch(function(e){btn.disabled=false;btn.textContent='사용처리';showErr(e);});
-}
-
-/* ===== 부팅 ===== */
-function loadSettingsThen(cb){
-  call('getSettings').then(function(s){
-    STORE.name=s.store_name||STORE.name;STORE.tel=s.store_tel||'';STORE.addr1=s.store_addr1||STORE.addr1;STORE.addr2=s.store_addr2||STORE.addr2;
-    STORE.footer=s.coupon_footer||STORE.footer;STORE.amount=parseInt(s.default_amount,10)||50000;STORE.theme=s.theme||'light';pendingTheme=STORE.theme;
-    window.__hasPw=s.has_password;cb&&cb();
-  }).catch(function(e){ cb&&cb(); }); // 설정 로드 실패해도 진행
-}
-function boot(){
-  if(PAGE==='redeem'){ initRedeem(); return; }
-  document.getElementById('adminApp').style.display='flex';
-  loadSettingsThen(function(){
-    applyTheme(STORE.theme); applyStoreToUI(); fillSettings();
-    document.getElementById('homeSub').textContent=STORE.name+' · Google Sheet 중앙 원장';
-    document.getElementById('pwState').textContent=window.__hasPw?'설정됨 ✓':'아직 설정되지 않음 — 사용처리 전 설정 필요';
-    // 기본 유효기간 채움
-    var d=new Date();d.setDate(d.getDate()+90);document.getElementById('f_valid').value=d.toISOString().slice(0,10);
-    syncCard(); loadHome();
-  });
-}
-window.addEventListener('DOMContentLoaded',boot);
+window.v060RenderVer = function(){
+  const data=window._setVer||SET_SAMPLE;
+  const q=(document.getElementById('setVerSearch').value||'').toLowerCase();
+  document.getElementById('setCurVer').textContent=data[0]?('(현재 '+data[0].ver+')'):'';
+  const rows=data.filter(v=>((v.ver||'')+(v.title||'')+(v.desc||'')).toLowerCase().includes(q));
+  document.getElementById('setVerWrap').innerHTML='<table class="setver"><colgroup><col style="width:90px"><col style="width:150px"><col><col style="width:130px"><col style="width:80px"></colgroup>'+
+    '<thead><tr><th>버전</th><th>제목</th><th>변경 내용</th><th>시각</th><th>소스</th></tr></thead><tbody>'+
+    (rows.map(v=>'<tr><td class="vc">'+(v.ver||'')+'</td><td>'+((v.title||'').replace(/</g,'&lt;'))+'</td><td>'+((v.desc||'').replace(/</g,'&lt;'))+'</td><td>'+(v.when||'—')+'</td><td>'+(v.src?'<a href="'+setSrv()+'/versions/'+encodeURIComponent(v.src)+'" download>⬇</a>':'—')+'</td></tr>').join('')||'<tr><td colspan="5" style="color:#8b97a5">결과 없음</td></tr>')+
+    '</tbody></table>';
+  const s=document.getElementById('setVerSearch'); if(s){const p=s.selectionStart;s.focus();try{s.setSelectionRange(p,p);}catch(_){}}
+};
+/* 페이지 목록에 환경설정 등록(닫기 함수가 인식하도록) */
+(function(){ if(typeof window!=='undefined'){ window._extraPages=(window._extraPages||[]).concat(['v060SettingsPage']); } })();
 </script>
+
 </body>
 </html>
+
+

@@ -10,12 +10,12 @@
   };
   const PERM_KEYS = [
     'canUploadFiles','canRunAnalysis','canDownloadXlsx','canDownloadPdf','canDownloadReport','canDownloadLog',
-    'canUseNumbering','canSavePositionMap','canLoadPositionMap','canViewAdvancedMode','canViewLogs','canManageAccounts','canEditPermissions'
+    'canUseNumbering','canSavePositionMap','canLoadPositionMap','canViewAdvancedMode','canViewLogs','canManageAccounts','canEditPermissions','canManageSettings'
   ];
   const ROLE_PERMS = {
     SUPER_ADMIN:Object.fromEntries(PERM_KEYS.map(k=>[k,true])),
-    ADMIN:{canUploadFiles:true,canRunAnalysis:true,canDownloadXlsx:true,canDownloadPdf:true,canDownloadReport:true,canDownloadLog:true,canUseNumbering:true,canSavePositionMap:true,canLoadPositionMap:true,canViewAdvancedMode:true,canViewLogs:true,canManageAccounts:false,canEditPermissions:false},
-    USER:{canUploadFiles:true,canRunAnalysis:true,canDownloadXlsx:true,canDownloadPdf:true,canDownloadReport:false,canDownloadLog:false,canUseNumbering:true,canSavePositionMap:true,canLoadPositionMap:true,canViewAdvancedMode:false,canViewLogs:true,canManageAccounts:false,canEditPermissions:false}
+    ADMIN:{canUploadFiles:true,canRunAnalysis:true,canDownloadXlsx:true,canDownloadPdf:true,canDownloadReport:true,canDownloadLog:true,canUseNumbering:true,canSavePositionMap:true,canLoadPositionMap:true,canViewAdvancedMode:true,canViewLogs:true,canManageAccounts:false,canEditPermissions:false,canManageSettings:true},
+    USER:{canUploadFiles:true,canRunAnalysis:true,canDownloadXlsx:true,canDownloadPdf:true,canDownloadReport:false,canDownloadLog:false,canUseNumbering:true,canSavePositionMap:true,canLoadPositionMap:true,canViewAdvancedMode:false,canViewLogs:true,canManageAccounts:false,canEditPermissions:false,canManageSettings:false}
   };
   const ROLE_LABELS = {SUPER_ADMIN:'슈퍼 관리자', ADMIN:'관리자', USER:'일반 사용자'};
   const PERM_LABELS = {
@@ -142,6 +142,7 @@
     const role = $('v060UserRole'); if(role && u){ role.textContent = roleLabel(u.role); role.className = 'v060-role ' + u.role; }
     const accBtn = $('v060AccountsBtn'); if(accBtn) accBtn.style.display = logged && can('canManageAccounts') ? 'inline-flex' : 'none';
     const logsBtn = $('v060LogsBtn'); if(logsBtn) logsBtn.style.display = logged && can('canViewLogs') ? 'inline-flex' : 'none';
+    const setBtn = $('v060SettingsBtn'); if(setBtn) setBtn.style.display = logged && can('canManageSettings') ? 'inline-flex' : 'none';
     const numBtn = $('v060NumberingBtn'); if(numBtn) numBtn.style.display = logged && can('canUseNumbering') ? 'inline-flex' : 'none';
     const logoutBtn = $('v060LogoutBtn'); if(logoutBtn) logoutBtn.style.display = logged ? 'inline-flex' : 'none';
     const advBtn = $('advBtn'); if(advBtn) advBtn.style.display = logged && can('canViewAdvancedMode') ? 'inline-flex' : 'none';
@@ -160,7 +161,7 @@
     v060ClosePages();
   };
   window.v060Logout = function(){ const u=current(); if(u) record('login',{status:'success',action:'logout'}); setCurrent(null); updateUI(); };
-  window.v060ClosePages = function(){ ['v060AccountsPage','v060LogsPage','numberingPage'].forEach(id=>$(id)?.classList.remove('open')); document.body.classList.remove('v060-page-open'); };
+  window.v060ClosePages = function(){ ['v060AccountsPage','v060LogsPage','numberingPage','v060SettingsPage'].forEach(id=>$(id)?.classList.remove('open')); document.body.classList.remove('v060-page-open'); };
   window.v060ReturnToMain = function(){
     v060ClosePages();
     const userMode = $('userMode');
